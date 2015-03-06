@@ -14,30 +14,41 @@
 %
 % Copyrighit: author: Kezhi Li, CSC, MRC, Imperial College, London
 % 23/02/2015
+% You will not remove any copyright or other notices from the Software; 
+% you must reproduce all copyright notices and other proprietary 
+% notices on any copies of the Software.
 
 %% Parameters
 
+% please add the folder name here
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo\.'));
+
 % the file location to save current tracking video
-filename = 'testworm_25Feb15-coil-0(3.5-10-50).gif';
+filename = 'results\testworm_02Mar15-0(3.5-10-50).gif';
+% filename = 'testworm_26Feb15-0(3.5-10-50).gif';
 
 % the number of particles(hypotheses) are saved after each iteration
-N_particles = 10; 
+N_particles = 10;  % 10
 % the number of sub-particles generated in each iteration
-sub_num = 50;
+sub_num = 50;  % 50
+
+% the length (pixels) of each segment of the skeleton (this value relates to Frenet_Coil)
+seg_len = 8;  % 8 
 
 % the proximated various of the image (0~255)
-Xstd_rgb = 40;
+Xstd_rgb = 60; % 40
 % the first derivative of the worm velocity (pixels/second)
-var_speed = 2; 
+var_speed = 2; % 2
 
 % the width of the worm (pixels= width *2)
-width = 3.5;
+width = 3.5; % 3.5
 
 %% Loading Movie
 % the input video
-vr = VideoReader('Vedeo_coil.avi');
+vr = VideoReader('\Sample_Video\Video_2702.avi');
 % the initial state (skeleton, frenent N,T, etc)
-load Frenet_Coil;
+%load Frenet_Coil;
+load Frenet_2702.mat;
 
 % The resolution of each frame
 Npix_resolution = [ vr.Height  vr.Width];
@@ -46,9 +57,10 @@ Nfrm_movie = floor(vr.Duration * vr.FrameRate);
 % The inner correlation between the real image and the predicted image
 inn_result = zeros(Nfrm_movie,1);
 
+Y_1 = read(vr, 1);
+Y_2 = read(vr, 2);
+
 %% Object Tracking by Particle Filter
-% the length (pixels) of each segment of the skeleton (this value relates to Frenet_Coil)
-seg_len = 8;
 
 % Initial predicted worm
 X = create_particles_hypo(N_particles, Frenet_Pt{2});
