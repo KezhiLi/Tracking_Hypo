@@ -59,7 +59,25 @@ if speed>0;
             break;
         end
     end
-
+    % debug use
+    if size(ske_pred,1)<60
+        ske_pred
+    end
+    
+    extr_pt = size(ske_pred,1)-no_seg_old;
+            if extr_pt>0
+                for jj = 1:extr_pt;  
+                    del_ind = jj*2;
+                    ske_pred = ske_pred([1:del_ind-1,del_ind+1:end],:);
+                end
+            elseif extr_pt<0
+                for jj = 1:(-extr_pt); 
+                    add_ind = jj*2;
+                    ske_pred = [ske_pred([1:add_ind-1],:);...
+                                        (ske_pred(add_ind-1,:)+ske_pred(add_ind,:))/2;...
+                                        ske_pred(add_ind:end,:)];
+                end 
+            end
 elseif speed<0;
         % find the index of head point in forward curve
     [neighborIds_for neighborDistances] = kNearestNeighbors(back_curv, head, 2);
@@ -99,7 +117,25 @@ elseif speed<0;
             break;
         end
     end
-
+    % debug use
+    if size(ske_pred,1)<60
+        ske_pred
+    end
+    extr_pt = size(ske_pred,1)-no_seg_old;
+            if extr_pt>0
+                for jj = 1:extr_pt;  
+                    del_ind = jj*2;
+                    ske_pred = ske_pred([1:del_ind-1,del_ind+1:end],:);
+                end
+            elseif extr_pt<0
+                for jj = 1:(-extr_pt);  
+                    add_ind = jj*2;
+                    ske_pred = [ske_pred([1:add_ind-1],:);...
+                                        (ske_pred(add_ind-1,:)+ske_pred(add_ind,:))/2;...
+                                        ske_pred(add_ind:end,:)];
+                end 
+            end
+    
 else
     % in the case that speed = 0, skeleton stays the same
     

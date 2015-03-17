@@ -1,4 +1,4 @@
-function [ang_hypo,ang_chan, mid_start, speed, omg,len_short] = ang2ang_acc(ang, omg,jj, speed,len_short)
+function [ang_hypo,ang_chan, mid_start, speed, omg] = ang2ang_acc(ang, omg,jj, speed)
 % calculate the hypothesis angles based on previous angles
 %
 % Input: angle: an M *1 vector
@@ -25,36 +25,36 @@ mid_start = round(len_ang/2);
 mid_end = mid_start+1;
 
 % These two are designed functions for variances of tha angle change
-distr =  (exp(-0.9*(len_ang-(1:len_ang))))';
+distr =  (exp(-0.5*(len_ang-(1:len_ang))))';   % -0.9
 distr(end) = distr(end)*0.6;
 
 %% Artificially change the angle according to 'jj'
     if jj<23  % jj =1~22, artificially change angles
         ang_hypo_temp =ang;
         if jj<4
-            ang_hypo_temp(1:jj) = ang_hypo_temp(1:jj)+0.25; %0.8
+            ang_hypo_temp(1:jj) = ang_hypo_temp(1:jj)+0.3; %0.8
         elseif jj<7&&jj>3
-            ang_hypo_temp(1:(jj-3)) = ang_hypo_temp(1:(jj-3))-0.25;
+            ang_hypo_temp(1:(jj-3)) = ang_hypo_temp(1:(jj-3))-0.3;
         elseif jj<10&&jj>6
-            ang_hypo_temp((end-(jj-7)):end) = ang_hypo_temp((end-(jj-7)):end)+0.25;
+            ang_hypo_temp((end-(jj-7)):end) = ang_hypo_temp((end-(jj-7)):end)+0.3;
             omg = omg + 0.1 + (jj-7)*0.04;
         elseif jj<13&&jj>9
-            ang_hypo_temp((end-(jj-10)):end) = ang_hypo_temp((end-(jj-10)):end)-0.25;
+            ang_hypo_temp((end-(jj-10)):end) = ang_hypo_temp((end-(jj-10)):end)-0.3;
             omg = omg - 0.1 - (jj-10)*0.04;
         elseif jj == 13;
-            ang_hypo_temp(1:4) = ang_hypo_temp(1:4)+[0.4,0.3,0.2,0.10]';
+            ang_hypo_temp(1:4) = ang_hypo_temp(1:4)+[0.6,0.4,0.26,0.15]';
         elseif jj==14;
-            ang_hypo_temp(1:4) = ang_hypo_temp(1:4)-[0.4,0.3,0.2,0.10]';
+            ang_hypo_temp(1:4) = ang_hypo_temp(1:4)-[0.6,0.4,0.26,0.15]';
         elseif jj==15;
-            ang_hypo_temp(end-3:end) = ang_hypo_temp(end-3:end)+[0.1,0.2,0.3,0.4]'; %0.3,0.6,0.9,1.2
+            ang_hypo_temp(end-3:end) = ang_hypo_temp(end-3:end)+[0.15,0.26,0.4,0.6]'; %0.3,0.6,0.9,1.2
             omg = omg + 0.2;
         elseif jj==16;       
-            ang_hypo_temp(end-3:end) = ang_hypo_temp(end-3:end)-[0.1,0.2,0.3,0.4]';
+            ang_hypo_temp(end-3:end) = ang_hypo_temp(end-3:end)-[0.12,0.26,0.4,0.6]';
             omg = omg - 0.2;
         elseif jj==17
-            ang_hypo_temp(1:2) = ang_hypo_temp(1:2)+[7.0,0.4]';
+            ang_hypo_temp(1:2) = ang_hypo_temp(1:2)+[0.7,0.4]';
         elseif jj==18
-            ang_hypo_temp(1:2) = ang_hypo_temp(1:2)-[7.0,0.4]';
+            ang_hypo_temp(1:2) = ang_hypo_temp(1:2)-[0.7,0.4]';
         elseif jj==19
             ang_hypo_temp(end-1:end) = ang_hypo_temp(end-1:end)+[0.4,0.7]';
             omg = omg + 0.4;
@@ -74,7 +74,7 @@ distr(end) = distr(end)*0.6;
             ang_hypo_temp = ang;
             ang_hypo_temp(mid_start+1: mid_start+2) = ang_hypo_temp(mid_start+1: mid_start+2) + sign(randn(1))*[0.2; -0.2];
         else
-        omg = omg+randn(1)*0.2;
+        omg = omg+randn(1)*0.25;  % 0.2 
         ang_chan = omg * distr;
         ang_hypo_temp = ang + ang_chan;
         end

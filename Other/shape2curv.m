@@ -29,7 +29,7 @@ worm_shape_y(worm_shape_y<1)=1;
 worm_shape_x(worm_shape_x>siz(2))=siz(2);
 worm_shape_y(worm_shape_y>siz(1))=siz(1);
 
-% Output integer values
+% Output values
 worm_shape_x = round(worm_shape_x);
 worm_shape_y = round(worm_shape_y);
         

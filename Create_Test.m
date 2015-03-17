@@ -10,7 +10,7 @@ end
 chunkSize = [2048 2048 1];
 
 % change the sample video name here
-fname = ['Sample_Video\try_',date,'.avi' ];
+fname = ['Sample_Video\Video_',date,'.avi' ];
 writerObj = VideoWriter(fname);
 open(writerObj);
 

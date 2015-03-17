@@ -1,4 +1,4 @@
-function show_Worm(worm_show, Y_k, width, seg_len)
+function show_Worm(worm_show, Y_k, width, seg_len, ind)
 % show the worm in image
 % Input: worm_show: a ?*2 vector, the points on worm's skeleton
 %        Y_k: a matrix, current real image
@@ -15,9 +15,11 @@ function show_Worm(worm_show, Y_k, width, seg_len)
 
 %% Show current frame of video
 figure(1)
+if ind == 1;
 image(Y_k)
 %imshow(Y_k)
 title('+++ Tracking Single Worm +++')
+end
 
 %% Calculate the skeleton
 
@@ -53,8 +55,8 @@ worm_shape_y =  0.7*interp1(tc,worm_shape1(:,2),tsc,'spline')+0.3*interp1(tc,wor
 
 hold on
 
-plot(worm_shape_x,worm_shape_y,'LineWidth',2,'Color',[1 0.1 0.1]);
-plot(worm_ske_curv_x,worm_ske_curv_y,'LineWidth',2,'Color',[1 0.1 0.1]);
+plot(worm_shape_x,worm_shape_y,'LineWidth',2,'Color',[1 0.1*ind 0.16*ind]);
+plot(worm_ske_curv_x,worm_ske_curv_y,'LineWidth',2,'Color',[1 0.1*ind 0.16*ind]);
 
 hold off 
 

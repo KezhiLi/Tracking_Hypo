@@ -29,11 +29,12 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % The sample step of points on skeleton. Change it accordingly in the Main
 % function of video processing.
-samp_step = 8;
+samp_step = 6;
 
 % Input video
 %vr = VideoReader('Vedeo_coil.avi');
-vr = VideoReader('Sample_Video\Video_2702.avi');
+fname = ['Sample_Video\Video_',date,'.avi' ];
+vr = VideoReader(fname);
 % Read frames from the video
 Y_1 = read(vr, 1);
 Y_2 = read(vr, 2);
@@ -236,7 +237,7 @@ quiver(Frenet_Pt{k}.xy(hf_ske_index,1),Frenet_Pt{k}.xy(hf_ske_index,2),Frenet_Pt
 
 %% Save the Frenet for future use
 Frenet_Pt{2}=Frenet_Pt{1};
-save Frenet_2702.mat Frenet_Pt
+save Frenet_0903.mat Frenet_Pt
 
 
 

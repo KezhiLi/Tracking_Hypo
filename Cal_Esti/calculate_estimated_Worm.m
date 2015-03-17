@@ -1,4 +1,4 @@
-function [worm_show,X,inn_result_k] = calculate_estimated_Worm(X, worm_sav,  C_k, width, tt, seg_len)
+function [worm_show,X,inn_result_k] = calculate_estimated_Worm(X, worm_sav,  C_k, width, tt, seg_len, ind)
 % function to calculate the estimated worm
 % Input:    X: a cell matrix, all good hypotheses
 %           worm_sav: a ?*2 vector, the skeleton saved before
@@ -34,15 +34,17 @@ ts = 1:1/(seg_len*2):2*m_fre_pt;
 t2 = 1:9*m_fre_pt ;
 ts2 = 1:1/(seg_len*2):9*m_fre_pt;
 
-worm_ske = X{1}.xy;
+worm_ske = X{ind}.xy;
 % result is calculated from weighted averaging top tt hypotheses 
 para = exp(-(1:tt)*0.2+0.2);   % weights are exponentially decaying
 sum_para = sum(para);
 for ii=2:tt;
     worm_ske = worm_ske + X{ii}.xy*para(ii);
 end
-worm_ske1 = round(worm_ske/sum_para);
+%worm_ske1 = round(worm_ske/sum_para);
+worm_ske1 = worm_ske/sum_para;
 
+%worm_ske1 = worm_ske;
 sum_C_k = sum(sum(C_k));
 
 %% Calculate the new worm

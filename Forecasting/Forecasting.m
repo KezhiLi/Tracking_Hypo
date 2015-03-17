@@ -42,8 +42,19 @@ for ii=1:Npop_particles;
     
     % the extension curve, which is a combination of spline and linear
     % curves. (spline only seems weird sometimes)
-    pt_sp_x = 0.5*spline(t,Frenet_k_1.xy(:,1),ts) + 0.5*interp1(t,Frenet_k_1.xy(:,1),ts,'linear','extrap');
-    pt_sp_y = 0.5*spline(t,Frenet_k_1.xy(:,2),ts) + 0.5*interp1(t,Frenet_k_1.xy(:,2),ts,'linear','extrap');
+    linear_x = interp1(t,Frenet_k_1.xy(:,1),ts,'linear','extrap');
+    linear_y = interp1(t,Frenet_k_1.xy(:,2),ts,'linear','extrap');
+    spline_x = spline(t,Frenet_k_1.xy(:,1),ts);
+    spline_y = spline(t,Frenet_k_1.xy(:,2),ts);
+    ext_x = 0.8*linear_x + 0.2*spline_x;
+    ext_y = 0.8*linear_y + 0.2*spline_y;
+    inn_x = 0.2*linear_x + 0.8*spline_x;
+    inn_y = 0.2*linear_y + 0.8*spline_y;    
+    
+    pt_sp_x = [ext_x(1:3*seg_len),inn_x(3*seg_len+1:end-3*seg_len),ext_x(end-3*seg_len+1:end)];
+    pt_sp_y = [ext_y(1:3*seg_len),inn_y(3*seg_len+1:end-3*seg_len),ext_y(end-3*seg_len+1:end)];
+    %pt_sp_x = 0.5*spline(t,Frenet_k_1.xy(:,1),ts) + 0.5*interp1(t,Frenet_k_1.xy(:,1),ts,'linear','extrap');
+    %pt_sp_y = 0.5*spline(t,Frenet_k_1.xy(:,2),ts) + 0.5*interp1(t,Frenet_k_1.xy(:,2),ts,'linear','extrap');
     
     % the number '3' comes from 'ts'. The curve extends 3 segments to both head and
     % tail directions
@@ -104,21 +115,56 @@ for ii=1:Npop_particles;
         end
         
         % New skeleton prediction
-        ske_pred = ske_prediction(speed(jj), [pt_sp_x',pt_sp_y'], [flipud(pt_sp_x'),flipud(pt_sp_y')],head_loc, tail_loc);
+        ske_pred_1 = ske_prediction(speed(jj), [pt_sp_x',pt_sp_y'], [flipud(pt_sp_x'),flipud(pt_sp_y')],head_loc, tail_loc, seg_len);
 
+        % interpolation to keep the same number of samples
+        len_ske_pred = size(ske_pred_1,1);
+        len_ske_old = length(inn_x(3*seg_len+1:end-3*seg_len));
+        if len_ske_pred == len_ske_old
+            ske_pred =  ske_pred_1;
+        else
+            pp = 1:len_ske_pred;
+            qq = 1:((len_ske_pred-1)/(len_ske_old-1)):len_ske_pred;
+            ske_pred_x0 = interp1(pp,ske_pred_1(:,1),qq,'spline');
+            ske_pred_y0 = interp1(pp,ske_pred_1(:,2),qq,'spline');
+            ske_pred_2 = [ske_pred_x0',ske_pred_y0'];
+            
+            qq2 = zeros(len_ske_old,1);
+            [length_ske_pred, dis_ske] = pt_len(ske_pred_2);
+            reci_dis_ske = [0;1./dis_ske];
+            sum_reci_dis_ske = sum(reci_dis_ske);
+            for q = 1:len_ske_old;
+                qq2(q) = (len_ske_old-1)*(sum(reci_dis_ske(1:q)))/sum_reci_dis_ske+1;
+            end
+            ske_pred_x1 = interp1(1:len_ske_old,ske_pred_x0,qq2,'spline');
+            ske_pred_y1 = interp1(1:len_ske_old,ske_pred_y0,qq2,'spline');
+            ske_pred = [ske_pred_x1,ske_pred_y1];
+        end
+        
+
+        
+        % debug use
+%         if size(ske_pred) ~= length(inn_x(3*seg_len+1:end-3*seg_len))
+%             pause(1);
+%         end
+        
+jj
+
+        size(ske_pred,1)
         % calculate the angle of each point
         [pt_ske_pred, vec_len_pred, angle_ske_pred] = ske2ang(ske_pred, seg_len);
         
+        
         % sum lengths prediction
         sum_len_pred = sum(vec_len_pred)+randn(1);
-        % The total length change
-        len_short = sum_len(ii) - sum_len_pred;
-
+%         % The total length change
+%         len_short = sum_len(ii) - sum_len_pred;
+        len_short = 0;
 
         % calculate the angle hypothesis. Two different functions for first
         % half and second half of the worm. The mid segment is mid_start to
         % mid_end. 
-        [ang_hypo,ang_chan, mid_start, speed(jj), omg(jj),len_short] = ang2ang_acc(angle_ske_pred, omg(jj),jj,speed(jj),len_short);
+        [ang_hypo,ang_chan, mid_start, speed(jj), omg(jj)] = ang2ang_acc(angle_ske_pred, omg(jj),jj,speed(jj));
 
         % set a threshold of the skeleton lengths
         if sum_len_pred <len_min
@@ -127,12 +173,13 @@ for ii=1:Npop_particles;
             len_short = len_short + (len_max - sum_len_pred);
         end
 
-        % Compensate the length change to each segment
-        vec_len_pred = vec_len_pred + len_short/(length(vec_len_pred));
-        % Adjust the length of each segement, make them with more uniform
-        % lengths
-        ave_vec_len_pred = sum_len_pred/(length(vec_len_pred));
-        vec_len_pred_adjust = 0.8*vec_len_pred +0.2*ave_vec_len_pred;
+        % Compensate the length change to the last 3 segments near tail
+        vec_len_pred = vec_len_pred + len_short/length(vec_len_pred);
+%         % Adjust the length of each segement, make them with more uniform
+%         % lengths
+          ave_vec_len_pred = sum_len_pred/(length(vec_len_pred));
+%         vec_len_pred_adjust = 0.8*vec_len_pred +0.2*ave_vec_len_pred;
+          vec_len_pred_adjust = vec_len_pred;
         
         %  jj=41~46: artificially change the total length
         if jj>40 && jj<47
@@ -157,7 +204,7 @@ for ii=1:Npop_particles;
 
         % calculate hypothesis middle point
         % variance along the tangent direction
-        var_ske_direc = 1; %3; 
+        var_ske_direc = 0; %3; 
         % random noise 
         var_direc = 0; %3;
         

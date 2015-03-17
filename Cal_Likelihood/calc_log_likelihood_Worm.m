@@ -81,7 +81,7 @@ for ii = 1:Npop_particles;
     for jj = 1:sub_num;
 
         area_hypo = zeros(size(Y,1),0)*zeros(0,size(Y,2));
-        
+ 
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);
         % points on contour to contour
