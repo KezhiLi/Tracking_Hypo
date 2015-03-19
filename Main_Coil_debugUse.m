@@ -24,15 +24,15 @@
 addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_10\.'));
 
 % the file location to save current tracking video
-filename = 'results\testworm_1(3.5-5-50)17-Mar15.gif';
-% filename = 'testworm_26Feb15-0(3.5-10-50).gif';
+% filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
+filename = 'results\testworm_19Mar15-0(3.5-20-100).gif';
 
-fname = ['results\testworm_1(3.5-5-50)',date,'.avi' ];
+fname = ['results\testworm_1(3.5-20-100)',date,'.avi' ];
 
 % the number of particles(hypotheses) are saved after each iteration
-N_particles = 10;  % 10
+N_particles = 20;  % 10
 % the number of sub-particles generated in each iteration
-sub_num = 50;  % 50
+sub_num = 100;  % 50
 
 % the length (pixels) of each segment of the skeleton (this value relates to Frenet_Coil)
 seg_len = 8;  % 8 
@@ -43,18 +43,18 @@ Xstd_rgb = 60; % 40
 var_speed = 5; % 2
 
 % the width of the worm (pixels= width *2)
-width = 3; % 3.5
+width = 3.5; % 3.5
 
 % video rate
 fps = 10; 
 
 %% Loading Movie
 % the input video
-vr = VideoReader('\Sample_Video\Video_coil.avi');
-%vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
+%vr = VideoReader('\Sample_Video\Video_coil.avi');
+vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 % the initial state (skeleton, frenent N,T, etc)
-load Frenet_Coil;
-%load Frenet_0203.mat;
+%load Frenet_Coil;
+load Frenet_1903.mat;
 
 % The resolution of each frame
 Npix_resolution = [ vr.Height  vr.Width];
@@ -77,8 +77,8 @@ worm_show = [];
 worm_show = X{1}.xy;
 
 % length max, min
-len_max = 95;
-len_min = 70;
+len_max = 88;   % 100
+len_min = 70;    % 80
 
 % k represent the index of frame image
 for k = 3:Nfrm_movie
@@ -87,7 +87,9 @@ for k = 3:Nfrm_movie
     Y_k = read(vr, k);
     
     % Forecasting
-    XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
+    %XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
+    
+    XX = Hypo_1st(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
     
     % Indication purpose 
     k
@@ -108,8 +110,10 @@ for k = 3:Nfrm_movie
     ind = 1;
     [worm_show, X, inn_result(k)] = calculate_estimated_Worm(X, worm_show,  C_k, width,tt, seg_len, ind);
     
-    for ii = 1:1;
-        ind = ii;
+    show_Worm(worm_show, Y_k, width, seg_len, ind);
+    
+    for ii = 1:5;
+        ind = ii
     % Show the estimated worm body (worm_show)
         show_Worm(X{ind}.xy, Y_k, width, seg_len, ind);
     

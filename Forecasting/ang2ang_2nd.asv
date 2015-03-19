@@ -1,0 +1,37 @@
+function [ang_hypo,mid_start] = ang2ang_2nd(ang, jj)
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+
+
+% calculate the length of angle vector
+len_ang = length(ang);
+
+if len_ang<1
+    len_ang
+end
+
+% Find the middle two points, set them as mid_start and mid_end
+mid_start = round(len_ang/2);
+mid_end = mid_start+1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
