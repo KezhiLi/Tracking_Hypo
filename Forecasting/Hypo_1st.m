@@ -12,6 +12,7 @@ function XX = Hypo_1st(Npop_particles, sub_num, var_speed, X, seg_len, len_max, 
         % random noise 
         var_direc = 0; %3;
         
+        var_mid = 2;
 
 % loop for every particle, generate sub_num sub-particles, in which 
 for ii=1:Npop_particles;
@@ -188,10 +189,10 @@ for ii=1:Npop_particles;
             [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2,0.2*ave_vec_len_pred);
             if jj==94
                 mid_hypo = pt_ske_pred(mid_start,:)+[X_mid, Y_mid];
-                ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,1);
+                ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,1, var_mid);
             else
                 mid_hypo = pt_ske_pred(mid_start,:)-[X_mid, Y_mid];
-                ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,-1);
+                ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,-1, var_mid);
             end
     else
             vel_i = 0;
@@ -242,11 +243,6 @@ for ii=1:Npop_particles;
          % indication use, show the total length after adjustment 
         sum(vec_len_pred_adjust)
           
-          
-
-        
-
-
 
         % calculate hypothesis skeleton according to angles
         ske_hypo = ang2ske(ang_hypo, vec_len_pred_adjust, mid_hypo, mid_start);

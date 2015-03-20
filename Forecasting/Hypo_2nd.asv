@@ -6,7 +6,8 @@ function XX = Hypo_2nd(Npop_particles, sub_num, var_speed, X, seg_len, len_max, 
 % 
 % 
 
-
+var_len_tail = 2;
+var_len_head = 2;
 
 % loop for every particle, generate sub_num sub-particles, in which 
 for ii=1:Npop_particles;
@@ -59,16 +60,17 @@ for ii=1:Npop_particles;
     speed = zeros(sub_num,1);
     omg = ones(sub_num,1) * X{ii}.omg;
 
-    %% keep the same speed  
-    speed_sec = 0;
+    % do not consider velocity 
+    speed_2nd = 0;
     
     % New skeleton prediction
-    ske_pred_speed_ori = ske_prediction(speed_sec, [pt_sp_x',pt_sp_y'], [flipud(pt_sp_x'),flipud(pt_sp_y')],head_loc, tail_loc, seg_len);
+    ske_pred_speed_ori = ske_prediction(speed_2nd, [pt_sp_x',pt_sp_y'], [flipud(pt_sp_x'),flipud(pt_sp_y')],head_loc, tail_loc, seg_len);
 
     ske_pred_1 = ske_pred_speed_ori;
    
+    scenario = [4,5,7,2,12];
                    % calculate the angle of each point
-    [pt_ske_pred, vec_len_pred, angle_ske_pred] = ske2ang(ske_pred_1, seg_len);
+    [pt_ske_pred, vec_len_pred, angle_ske_pred] = ske2ang(ske_pred_1, seg_len, scenario);
             
           
     %% generate sub-hypotheses    
@@ -78,7 +80,22 @@ for ii=1:Npop_particles;
             % calculate the angle hypothesis. Two different functions for first
             % half and second half of the worm. The mid segment is mid_start to
             % mid_end. 
-            [ang_hypo,mid_start, omg(jj)] = ang2ang_2nd(angle_ske_pred, jj);
+            [ang_hypo,mid_start, jj_4] = ang2ang_2nd(angle_ske_pred, jj);
+          
+            if jj > jj_4 - 3
+                if jj == jj-2
+                    [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2,0.2*ave_vec_len_pred);
+                    mid_hypo = pt_ske_pred(mid_start,:)+[X_mid, Y_mid];
+                elseif jj == jj-1
+                    [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2,0.2*ave_vec_len_pred);
+                    ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,-1);
+                elseif jj < jj_4 + scenario(5)/2
+                    vec_len_pred(1:2) = vec_len_pred(1:2) + randn(1) * var_len_tail * [1;1];
+                else 
+                    vec_len_pred(end-1:end) = vec_len_pred(end-1:end) + randn(1) * var_len_head * [1;1];
+                end
+            end
+            
                                                    
      if    jjj == mod((jj-75),6); 
             if jjj == 1  % head segment length plus

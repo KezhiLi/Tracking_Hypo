@@ -30,9 +30,11 @@ filename = 'results\testworm_20Mar15-0(3.5-20-100).gif';
 fname = ['results\testworm_1(3.5-20-100)',date,'.avi' ];
 
 % the number of particles(hypotheses) are saved after each iteration
-N_particles = 20;  % 10
+N_particles = 10;  % 10
 % the number of sub-particles generated in each iteration
-sub_num = 100;  % 50
+%sub_num = 50;  % 50
+sub_num_1 = 100;
+sub_num_2 = 50
 
 % the length (pixels) of each segment of the skeleton (this value relates to Frenet_Coil)
 seg_len = 8;  % 8 
@@ -86,23 +88,36 @@ for k = 3:Nfrm_movie
     % Getting Image
     Y_k = read(vr, k);
     
-    % Forecasting
+    
+  
+    %% 1st layer
     %XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
     
-    XX = Hypo_2nd(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
+    XX = Hypo_1st(N_particles, sub_num_1, var_speed, X, seg_len, len_max, len_min);
     
-    % Indication purpose 
-    k
-    if mod(k,20)==0
-        k
-    end
     % Calculating Log Likelihood
     [L, C_k] = calc_log_likelihood_Worm(Xstd_rgb, XX, Y_k, width, seg_len);
       
     % Resampling
     X  = resample_particles_Worm(XX, L);
     
-
+    %% 2nd layer
+    XX = Hypo_2nd(N_particles, sub_num_2, var_speed, X, seg_len, len_max, len_min);
+    
+        % Indication purpose 
+    k
+    if mod(k,20)==0
+        k
+    end
+    
+    % Calculating Log Likelihood
+    [L, C_k] = calc_log_likelihood_Worm(Xstd_rgb, XX, Y_k, width, seg_len);
+      
+    % Resampling
+    X  = resample_particles_Worm(XX, L);
+    
+    
+    
     hold on 
 
     % Weighted averaging best tt result to obtain the worm_show

@@ -148,7 +148,6 @@ for ii=1:Npop_particles;
 %             pause(1);
 %         end
         
-jj
 
         size(ske_pred,1)
         % calculate the angle of each point
