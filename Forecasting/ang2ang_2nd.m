@@ -29,21 +29,22 @@ jj_5 = jj_4 + scenario(5);
 
 ang_hypo_temp = ang;
     
-var_case1 = 0.2; 
+var_case1 = 0.5; 
 var_case2 = 0.2;
 var_case3 = 0.3;
-var_case4 = 0.2;
+var_case4 = 0.25;
 var_case5 = 0.2;
 
 if jj < jj_1
     % case 1
-    jj_case1_pt = floor((jj-1)/scenario(1)); %  1 ~ num_pt
+    jj_case1_pt = floor((jj-1)/scenario(1))+1; %  1 ~ num_pt
     jj_case1_idx =  mod(jj,scenario(1));       %  1 ~ scenario(1) 
     if jj_case1_pt == 1 || jj_case1_pt == 2
-        ang_hypo_temp(jj_case1_pt) = ang_hypo_temp(jj_case1_pt) + randn(1) * var_case1;
+        ang_hypo_temp(1:jj_case1_pt) = ang_hypo_temp(1:jj_case1_pt) + randn(1) * var_case1 * ones(jj_case1_pt,1)/jj_case1_pt;
     else 
-        idx_case1 = len_ang-(num_pt-jj_case1_pt);
-        ang_hypo_temp(idx_case1) = ang_hypo_temp(idx_case1) + randn(1) * var_case1;
+        jj_case1_pt_here = num_pt-jj_case1_pt;
+        idx_case1 = len_ang-jj_case1_pt_here;
+        ang_hypo_temp(idx_case1:end) = ang_hypo_temp(idx_case1:end) + randn(1) * var_case1 * ones(jj_case1_pt_here+1,1)/(jj_case1_pt_here+1);
     end
 elseif jj < jj_2
     % case 2

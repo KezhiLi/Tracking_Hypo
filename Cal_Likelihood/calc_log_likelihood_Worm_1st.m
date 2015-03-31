@@ -1,4 +1,4 @@
-function [L,C] = calc_log_likelihood_Worm(Xstd_rgb, XX, Y, width, seg_len)
+function [L,C] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_len,  para_thre)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
@@ -38,8 +38,8 @@ II = imclose(II, se);
 
 %figure, hist(double(I),256); 
 
-% we set an artificial parameter 0.0.8 here
-level = graythresh(II)*0.92;
+% we set an artificial parameter 0.0.8 here % coil: 0.9  normal: 0.8
+level = graythresh(II)* para_thre;
 BW = im2bw(II,level);
 %figure, imshow(BW)
 
@@ -80,7 +80,7 @@ B = - 0.5 / (Xstd_rgb.^2);
 for ii = 1:Npop_particles;
     for jj = 1:sub_num;
 
-        area_hypo = zeros(size(Y,1),0)*zeros(0,size(Y,2));
+        area_hypo = zeros(Npix_h,0)*zeros(0,Npix_w);
  
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);

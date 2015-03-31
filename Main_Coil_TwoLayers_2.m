@@ -13,7 +13,7 @@
 %         and a tracking video saved as 'filename'
 %
 % Copyrighit: author: Kezhi Li, CSC, MRC, Imperial College, London
-% 23/02/2015
+% 30/03/2015
 % You will not remove any copyright or other notices from the Software; 
 % you must reproduce all copyright notices and other proprietary 
 % notices on any copies of the Software.
@@ -21,18 +21,35 @@
 %% Parameters
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_10\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_14\.'));
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm_23Mar15-0(3.5-20-100).gif';
+filename = 'results\testworm_coil_31Mar15-0(3-50-100).gif';
+fname = ['results\testworm_coil_0(3-50-100)',date,'.avi' ];
 
-fname = ['results\testworm_1(3.5-20-100)',date,'.avi' ];
+%% Loading Movie
+% the input video
+vr = VideoReader('\Sample_Video\Video_coil.avi');
+%vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 
+% the initial state (skeleton, frenent N,T, etc)
+load Frenet_Coil;
+%load Frenet_Pt_full;
+%load Frenet_1903.mat;
+
+% The resolution of each frame
+Npix_resolution = [ vr.Height  vr.Width];
+% The total number of frames
+Nfrm_movie = floor(vr.Duration * vr.FrameRate);
+
+%% Parameters
 % the number of particles(hypotheses) are saved after each iteration
-N_particles = 20;  % 10
+N_particles = 10;  % 10
 % the number of sub-particles generated in each iteration
-sub_num = 100;  % 50
+%sub_num = 50;  % 50
+sub_num_1 = 100;
+sub_num_2 = 50;
 
 % the length (pixels) of each segment of the skeleton (this value relates to Frenet_Coil)
 seg_len = 8;  % 8 
@@ -40,31 +57,31 @@ seg_len = 8;  % 8
 % the proximated various of the image (0~255)
 Xstd_rgb = 60; % 40
 % the first derivative of the worm velocity (pixels/second)
-var_speed = 5; % 2
+var_speed = 7; % 5
+var_len   = 10;
 
 % the width of the worm (pixels= width *2)
-width = 3.5; % 3.5
+width = 3.5; % 3.5      Frenet_1903.mat: 3; 
+para_thre = 0.82;   % coil: 0.80  normal: 0.92
+
+% length max, min    
+% Frenet_1903.mat: (88,70); Frenet_Coil.mat: (105,85);
+len_max = 105;   % 105        
+len_min = 85;    % 85
+size_blk = round((len_max+len_min)/12); 
 
 % video rate
 fps = 10; 
 
-%% Loading Movie
-% the input video
-%vr = VideoReader('\Sample_Video\Video_coil.avi');
-vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
-% the initial state (skeleton, frenent N,T, etc)
-%load Frenet_Coil;
-load Frenet_1903.mat;
-
-% The resolution of each frame
-Npix_resolution = [ vr.Height  vr.Width];
-% The total number of frames
-Nfrm_movie = floor(vr.Duration * vr.FrameRate);
+%% Initial Setup
 % The inner correlation between the real image and the predicted image
 inn_result = zeros(Nfrm_movie,1);
 
-Y_1 = read(vr, 1);
-Y_2 = read(vr, 2);
+Y_1 = read(vr, 1); % first frame
+Y_2 = read(vr, 2); % second frame
+
+h_Y = size(Y_1,1);
+w_Y = size(Y_1,2);
 
 %% Object Tracking by Particle Filter
 
@@ -76,9 +93,6 @@ worm_show = [];
 %worm_show{1} = X{1}.xy;
 worm_show = X{1}.xy;
 
-% length max, min
-len_max = 88;   % 100
-len_min = 70;    % 80
 
 % k represent the index of frame image
 for k = 3:Nfrm_movie
@@ -86,22 +100,39 @@ for k = 3:Nfrm_movie
     % Getting Image
     Y_k = read(vr, k);
     
-    % Forecasting
-    XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
+    
+  
+    %% 1st layer
+    %XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
+    
+    XX = Hypo_1st(N_particles, sub_num_1, var_speed, var_len, X, seg_len, len_max, len_min);
     
     % Indication purpose 
     k
-    if mod(k,20)==0
+    if mod(k,15)==0
         k
     end
+    
     % Calculating Log Likelihood
-    [L, C_k] = calc_log_likelihood_Worm(Xstd_rgb, XX, Y_k, width, seg_len);
+    [L, C_k] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y_k, width, seg_len, para_thre);
       
     % Resampling
     X  = resample_particles_Worm(XX, L);
     
+    %% 2nd layer
+    XX = Hypo_2nd(N_particles, sub_num_2, var_speed, X, seg_len, len_max, len_min);
+    
 
-    hold on 
+    
+    % Calculating Log Likelihood
+    [L, C_k] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C_k, width, seg_len, para_thre, size_blk);
+      
+    % Resampling
+    X  = resample_particles_Worm(XX, L);
+    
+    
+    
+    % hold on 
 
     % Weighted averaging best tt result to obtain the worm_show
     tt =3;
@@ -110,13 +141,18 @@ for k = 3:Nfrm_movie
     
     show_Worm(worm_show, Y_k, width, seg_len, ind);
     
-    for ii = 1:5;
-        ind = ii
+    for ii = 5:-1:1;
+        ind = ii;
     % Show the estimated worm body (worm_show)
         show_Worm(X{ind}.xy, Y_k, width, seg_len, ind);
-    
-        drawnow
     end
+    
+    C_k_outline = bwperim(C_k);
+    [N, Vertices, Lines, Vertices_orignal] = curvature_N_areainput(C_k_outline, seg_len*2);
+    hold on, plot(Vertices(:,1),h_Y-Vertices(:,2)+1, 'LineWidth',1.2,'Color',[0 0.5 1]);
+    
+    drawnow
+    
     
     hold off
     % Save the figure shown as a frame of the output video 

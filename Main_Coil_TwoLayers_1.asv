@@ -25,9 +25,9 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm_25Mar15-2(3.5-20-100).gif';
+filename = 'results\testworm_26Mar15-0(3.5-20-100).gif';
 
-fname = ['results\testworm_0(3.5-20-100)',date,'.avi' ];
+fname = ['results\testworm_1(3.5-20-100)',date,'.avi' ];
 
 % the number of particles(hypotheses) are saved after each iteration
 N_particles = 10;  % 10
@@ -42,7 +42,7 @@ seg_len = 8;  % 8
 % the proximated various of the image (0~255)
 Xstd_rgb = 60; % 40
 % the first derivative of the worm velocity (pixels/second)
-var_speed = 3; % 2
+var_speed = 5; % 2
 
 % the width of the worm (pixels= width *2)
 width = 3.5; % 3.5
@@ -106,7 +106,7 @@ for k = 3:Nfrm_movie
     
         % Indication purpose 
     k
-    if mod(k,50)==0
+    if mod(k,20)==0
         k
     end
     
@@ -127,6 +127,12 @@ for k = 3:Nfrm_movie
     
     show_Worm(worm_show, Y_k, width, seg_len, ind);
     
+    
+    [N, Vertices, Lines, Vertices_orignal] = curvature_N_areainput(C_k, seg_len*2);
+    hold on, plot(Vertices(:,1),Vertices(:,2), 'LineWidth',1.2,'Color',[0 0.5 1]);
+    
+    
+    
     for ii = 1:5;
         ind = ii
     % Show the estimated worm body (worm_show)
@@ -135,9 +141,7 @@ for k = 3:Nfrm_movie
         drawnow
     end
     
-    C_k_outline = bwperim(C_k);
-    [curv, Vertices_new, Lines, Vertices] = curvature_N_areainput(C_k_outline, 2*size(X{1,1}.xy,1));
-    hold on, plot(Vertices_new(:,1),size(Y_1,1)-Vertices_new(:,2)+0.5,'LineWidth',1,'Color',[0 1 0.5]);
+    
     
     hold off
     % Save the figure shown as a frame of the output video 

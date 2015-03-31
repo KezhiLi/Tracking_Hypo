@@ -32,8 +32,8 @@ ang_hypo_temp = ang;
 var_case1 = 0.2; 
 var_case2 = 0.2;
 var_case3 = 0.3;
-var_case4 = 0.2;
-var_case5 = 0.2;
+var_case4 = 0.3;
+var_case5 = 0.3;
 
 if jj < jj_1
     % case 1

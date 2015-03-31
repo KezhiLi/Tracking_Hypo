@@ -25,7 +25,7 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm_20Mar15-0(3.5-20-100).gif';
+filename = 'results\testworm_23Mar15-0(3.5-20-100).gif';
 
 fname = ['results\testworm_1(3.5-20-100)',date,'.avi' ];
 

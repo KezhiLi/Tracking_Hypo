@@ -1,4 +1,4 @@
-function [ang_hypo, mid_start, omg] = ang2ang_1st(ang, ang_head_i,ang_tail_i ,omg,jj)
+function [ang_hypo, mid_start, omg] = ang2ang_1st_narrow(ang, ang_head_i,ang_tail_i ,omg)
 % 
 % 
 % 
@@ -20,8 +20,8 @@ end
 mid_start = round(len_ang/2);
 mid_end = mid_start+1;
 
-ang_head_chg = ang_head_i * [0.15,0.25,0.4,0.55]';
-ang_tail_chg = ang_tail_i * [0.65,0.5,0.4,0.2]';
+ang_head_chg = ang_head_i * [1,2]' * rand(1);
+ang_tail_chg = ang_tail_i * [2, 1]' * rand(1);
 
 % These two are designed functions for variances of tha angle change
 distr =  (exp(-0.5*(len_ang-(1:len_ang))))';   % -0.9
@@ -30,8 +30,8 @@ distr(end) = distr(end)*0.6;
 ang_chan = omg * distr;
 ang_hypo_temp = ang + ang_chan;
 
-ang_hypo_temp(1:4) = ang_hypo_temp(1:4) + ang_tail_chg;
-ang_hypo_temp(end-3:end) = ang_hypo_temp(end-3:end) + ang_head_chg;
+ang_hypo_temp(1:2) = ang_hypo_temp(1:2) + ang_tail_chg;
+ang_hypo_temp(end-1:end) = ang_hypo_temp(end-1:end) + ang_head_chg;
 
 omg = omg + ang_head_i * 0.2;
 

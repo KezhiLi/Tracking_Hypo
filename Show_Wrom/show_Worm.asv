@@ -55,7 +55,7 @@ worm_ske_curv_y =  0.7*interp1(t,worm_ske1(:,2),ts,'spline')+0.3*interp1(t,worm_
 
 hold on
 %plot(worm_shape_x,worm_shape_y,'LineWidth',2,'Color',[1 0.1*ind 0.16*ind]);
-plot(worm_ske_curv_x(5:end-4),worm_ske_curv_y(5:end-4),'LineWidth',2,'Color',[1 0.1*ind 0.16*ind]);
+plot(worm_ske_curv_x(8:end-7),worm_ske_curv_y(8:end-7),'LineWidth',2,'Color',[1 0.1*ind 0.16*ind]);
 
 hold off 
 

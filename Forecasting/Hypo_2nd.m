@@ -13,8 +13,8 @@ var_ske_direc = 0; %3;
 var_direc = 0; %3;
         
         
-var_len_tail = 2;
-var_len_head = 2;
+var_len_tail = 1;
+var_len_head = 1;
 
 scenario = [4,5,7,2,12];
 
@@ -86,35 +86,13 @@ for ii=1:Npop_particles;
                     [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2,0.2*ave_vec_len_pred);
                     ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,-1);
                 elseif jj < jj_4 + scenario(5)/2
-                    vec_len_pred(1:2) = vec_len_pred(1:2) + randn(1) * var_len_tail * [1;1];
+                    vec_len_pred(1:2) = max( vec_len_pred(1:2) + rand(1) * var_len_tail * [1;1],[1;1]);
                 else 
-                    vec_len_pred(end-1:end) = vec_len_pred(end-1:end) + randn(1) * var_len_head * [1;1];
+                    vec_len_pred(end-1:end) = max( vec_len_pred(end-1:end) + rand(1) * var_len_head * [1;1],[1;1]);
                 end
             end
         
-        
-           % sum lengths prediction
-           sum_len_pred = sum(vec_len_pred)+randn(1);
-           % The total length change
-           %         len_short = sum_len(ii) - sum_len_pred;
-           len_short = 0;
-
-
-        % set a threshold of the skeleton lengths
-           if sum_len_pred <len_min
-                 len_short = len_short + (len_min - sum_len_pred);
-           elseif sum_len_pred >len_max
-                 len_short = len_short + (len_max - sum_len_pred);
-           end
-               
-     
-        % Compensate the length change to the last 3 segments near tail
-        vec_len_pred = vec_len_pred + len_short/length(vec_len_pred);
-%         % Adjust the length of each segement, make them with more uniform
-%         % lengths
-          ave_vec_len_pred = sum_len_pred/(length(vec_len_pred));
-%         vec_len_pred_adjust = 0.8*vec_len_pred +0.2*ave_vec_len_pred;
-          vec_len_pred_adjust = vec_len_pred;
+           [vec_len_pred_adjust, ave_vec_len_pred] = bound_vec(vec_len_pred, len_min, len_max);
           
         % calculate hypothesis skeleton according to angles
         ske_hypo = ang2ske(ang_hypo, vec_len_pred_adjust, mid_hypo, mid_start);
