@@ -1,4 +1,4 @@
-function [worm_show,X,inn_result_k] = calculate_estimated_Worm(X, worm_sav,  C_k, width, tt, seg_len, ind)
+function [worm_show,X,inn_result_k] = calculate_estimated_Worm(X, worm_sav,  C_k, width, tt, seg_len, ind, size_blk)
 % function to calculate the estimated worm
 % Input:    X: a cell matrix, all good hypotheses
 %           worm_sav: a ?*2 vector, the skeleton saved before
@@ -19,6 +19,8 @@ function [worm_show,X,inn_result_k] = calculate_estimated_Worm(X, worm_sav,  C_k
 % height and width
 Npix_h = size(C_k, 1);
 Npix_w = size(C_k, 2);
+
+mask_ori = ones(Npix_h,1)*ones(1,Npix_w);
 
 % empty image, faster if they are generated in these ways
 area_hypo = zeros(Npix_h,0)*zeros(0,Npix_w);
@@ -45,7 +47,7 @@ end
 worm_ske1 = worm_ske/sum_para;
 
 %worm_ske1 = worm_ske;
-sum_C_k = sum(sum(C_k));
+sum_C_k = sum(sum(C_k))/700;
 
 %% Calculate the new worm
 
@@ -56,7 +58,7 @@ sum_C_k = sum(sum(C_k));
 %[worm_shape_x, worm_shape_y] = shape2curv(worm_shape1, 0.5, t, ts, size(area_hypo));
 
 % calculate points inside body
-[worm_body_x, worm_body_y] = shape2curv(worm_body, 0.7, t2, ts2, size(area_hypo));
+[worm_body_x, worm_body_y] = shape2curv(worm_body, 1, t2, ts2, size(area_hypo));   % 0.7
 
 % debug use
 if isnan(sum(sum(worm_body_x)))
@@ -64,6 +66,9 @@ if isnan(sum(sum(worm_body_x)))
 end
        
 %area_hypo_1d = sub2ind(size(area_hypo),   worm_shape_y , worm_shape_x );
+
+mask_head = square_mtx_fast(mask_ori, X{ii}.xy(end-1,:), size_blk);
+mask = square_mtx_fast(mask_head, X{ii}.xy(2,:), size_blk);    
                 
 area_hypo_1d_inside = sub2ind(size(area_hypo),   worm_body_y , worm_body_x );
         
@@ -88,7 +93,7 @@ if I && J
     BW2_hypo = bwareaopen(BWdfill_hypo, 50); 
         
         % calculate the coherence for current hypothese
-    D_new = sum(sum(imabsdiff(C_k,BW2_hypo)))/sum_C_k;           
+    D_new = sum(sum(imabsdiff(C_k,BW2_hypo).*mask))/sum_C_k;           
 
 end
 %% Calculate the saved worm
@@ -98,7 +103,7 @@ end
 
 %[worm_sav_shape_x, worm_sav_shape_y] = shape2curv(worm_sav_shape1, 0.5, t, ts, size(sav_area_hypo));
 
-[worm_sav_body_x, worm_sav_body_y] = shape2curv(worm_sav_body, 0.7, t2, ts2, size(sav_area_hypo));
+[worm_sav_body_x, worm_sav_body_y] = shape2curv(worm_sav_body, 1, t2, ts2, size(sav_area_hypo)); % 0.7
          
 %sav_area_hypo_1d = sub2ind(size(sav_area_hypo),   worm_sav_shape_y , worm_sav_shape_x );
                 
@@ -121,7 +126,7 @@ if II && JJ
     sav_BW2_hypo = bwareaopen(sav_BWdfill_hypo, 50); 
     
     % Calculate the coherence of the old worm
-    D_old = sum(sum(imabsdiff(C_k,sav_BW2_hypo)))/sum_C_k;           
+    D_old = sum(sum(imabsdiff(C_k,sav_BW2_hypo).*mask))/sum_C_k;           
 end
     
     % if the new worm is better than the old worm

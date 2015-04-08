@@ -1,4 +1,4 @@
-function [L,C] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C, width, seg_len,para_thre, size_blk)
+function [L,C, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C, width, seg_len,para_thre, size_blk)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
@@ -18,6 +18,8 @@ function [L,C] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C, width, seg_len,pa
 Npix_h = size(C, 1);
 Npix_w = size(C, 2);
 
+mask_ori = ones(Npix_h,1)*ones(1,Npix_w);
+
 % number of paricles and sub-particles
 Npop_particles = size(XX,1);
 sub_num = size(XX,2);
@@ -27,39 +29,6 @@ N = Npop_particles*sub_num;
 
 % likelihood vector
 L = zeros(1,N);
-
-% %% image processing to thresholding
-% Y = rgb2gray(Y);
-% II = 255 - Y;
-% 
-% % imclose
-% se = strel('disk', 1);
-% II = imclose(II, se);
-% 
-% %figure, hist(double(I),256); 
-% 
-% % we set an artificial parameter 0.0.8 here  % coil: 0.9  normal: 0.8
-% level = graythresh(II)*para_thre;
-% BW = im2bw(II,level);
-% %figure, imshow(BW)
-% 
-% reBW = imerode(BW,se);  %reBW = BW;
-% % reBW = -im2bw(I,level)+1;
-% % figure, imshow(reBW)
-% 
-% log_reBW = logical(reBW);
-% 
-% BWdfill = log_reBW;
-% %BWdfill = imfill(log_reBW, 'holes');
-% %figure, imshow(BWdfill);
-% %title('binary image with filled holes');
-% 
-% C = bwareaopen(BWdfill, 50); 
-% %figure, imshow(BW2);
-% %title('remove small areas');
-% 
-% % mask_bgd = ones(Npix_h,1)*ones(1,Npix_w);
-
 
 %% likelihood equation
 
@@ -87,16 +56,16 @@ for ii = 1:Npop_particles;
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);
         % points on contour to contour
-        [worm_shape_x, worm_shape_y] = shape2curv(worm_contour1, 0.5, t,ts,size(area_hypo));
+        [worm_shape_x, worm_shape_y] = shape2curv(worm_contour1, 1, t,ts,size(area_hypo));  % 0.5
         % points in body to area in body     
-        [worm_body_x, worm_body_y] = shape2curv(worm_body, 0.7, tt, tts,size(area_hypo));
+        [worm_body_x, worm_body_y] = shape2curv(worm_body, 1, tt, tts,size(area_hypo));    % 0.7
         % indexes of all points on contour 
         area_hypo_1d = sub2ind(size(area_hypo),   worm_shape_y , worm_shape_x );
         % indexes of all points inside the contour (body)        
         area_hypo_1d_inside = sub2ind(size(area_hypo),   worm_body_y , worm_body_x );
         
-        mask_head = square_mtx_fast(area_hypo, XX{ii,jj}.xy(end,:), size_blk);
-        mask = square_mtx_fast(mask_head, XX{ii,jj}.xy(1,:), size_blk);    
+        mask_head = square_mtx_fast(mask_ori, XX{ii,jj}.xy(end-1,:), size_blk);
+        mask = square_mtx_fast(mask_head, XX{ii,jj}.xy(2,:), size_blk);    
         
         I = (min(worm_shape_y) >= 1 & max(worm_shape_y) <= Npix_h);
         J = (min(worm_shape_x) >= 1 & max(worm_shape_x) <= Npix_w);
@@ -114,12 +83,12 @@ for ii = 1:Npop_particles;
 
             % cancel it to save time
             % BWdfill_hypo = imfill(log_reBW_hypo,  fliplr(worm_contour1(round(size(worm_contour1,1)/2),:))  );
-            BWdfill_hypo = log_reBW_hypo;
 
             %figure, imshow(BWdfill);
             %title('binary image with filled holes');
 
-            BW2_hypo = bwareaopen(BWdfill_hypo, 50); 
+            BW2_hypo = log_reBW_hypo;
+            % BW2_hypo = bwareaopen(log_reBW_hypo, 50); 
             %figure, imshow(BW2);
             %title('remove small areas');
 
@@ -127,7 +96,9 @@ for ii = 1:Npop_particles;
             D = sum(sum(imabsdiff(C,BW2_hypo).*mask))/img_ratio; 
             
 
-            D2 = D' * D;
+            D2 = D^2;
+            
+            XX{ii,jj}.D = D;
 
             % Calculate the likelihood
             L((ii-1)*sub_num+jj) =  A + B * D2;

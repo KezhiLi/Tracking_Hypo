@@ -1,4 +1,4 @@
-function show_Worm(worm_show, Y_k, width, seg_len, ind)
+function show_Worm(worm_show, Y_k, width, seg_len, ind, diff, loc, inn_result)
 % show the worm in image
 % Input: worm_show: a ?*2 vector, the points on worm's skeleton
 %        Y_k: a matrix, current real image
@@ -15,10 +15,18 @@ function show_Worm(worm_show, Y_k, width, seg_len, ind)
 
 %% Show current frame of video
 figure(1)
-if ind == 5;
+if loc == 1;
 image(Y_k)
 %imshow(Y_k)
 title('+++ Tracking Single Worm +++')
+end
+
+c=['diff ',num2str(loc), ' is ',num2str(round(diff))];
+text(5,2+loc*10,c);
+
+if ind == 1
+    c_inn_result = ['average diff 1 is ',num2str(mean(inn_result(inn_result>0)))];
+    text(5,2+(loc+1)*10,c_inn_result);
 end
 
 %% Calculate the skeleton

@@ -20,5 +20,6 @@ for ii = 1: Npop_particles;
     X{ii}.N = zeros(size(ske_spline));
     X{ii}.vel = zeros(1,2);
     X{ii}.omg = 0;
+    X{ii}.D = 0;
 end
 

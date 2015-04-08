@@ -55,29 +55,23 @@ for ii=1:Npop_particles;
     %(spline seems weird sometimes, particularly the extension part)
     
     % linear interpolation
-    linear_x = interp1(t,Frenet_k_1.xy(:,1),ts,'linear','extrap');
-    linear_y = interp1(t,Frenet_k_1.xy(:,2),ts,'linear','extrap');
+    linear_xy = interp1(t,Frenet_k_1.xy,ts,'linear','extrap');
     % spline interpolation
-%     spline_x = spline(t,Frenet_k_1.xy(:,1),ts);
-%     spline_y = spline(t,Frenet_k_1.xy(:,2),ts);
-    spline_x = interp1(t,Frenet_k_1.xy(:,1),ts,'spline','extrap');
-    spline_y = interp1(t,Frenet_k_1.xy(:,2),ts,'spline','extrap');
+    spline_xy = interp1(t,Frenet_k_1.xy,ts,'spline','extrap');
     
     % extension part
-    ext_x = 0.8*linear_x + 0.2*spline_x;
-    ext_y = 0.8*linear_y + 0.2*spline_y;
+    ext_xy = 0.8*linear_xy + 0.2*spline_xy;
     % inner part
-    inn_x = 0.2*linear_x + 0.8*spline_x;
-    inn_y = 0.2*linear_y + 0.8*spline_y;
+    inn_xy = 0.2*linear_xy + 0.8*spline_xy;
     
     % the interpolation obtained
-    pt_sp_x = [ext_x(1:3*seg_len),inn_x(3*seg_len+1:end-3*seg_len),ext_x(end-3*seg_len+1:end)];
-    pt_sp_y = [ext_y(1:3*seg_len),inn_y(3*seg_len+1:end-3*seg_len),ext_y(end-3*seg_len+1:end)];
+    pt_sp_xy = [ext_xy(1:3*seg_len,:);inn_xy(3*seg_len+1:end-3*seg_len,:);ext_xy(end-3*seg_len+1:end,:)];
     
     % the number '3' comes from 'ts'. The curve extends 3 segments to both head and
     % tail directions
-    head_loc = [pt_sp_x(seg_len*3+1),pt_sp_y(seg_len*3+1)];
-    tail_loc = [pt_sp_x(end-seg_len*3),pt_sp_y(end-seg_len*3)];
+
+    head_loc = pt_sp_xy(seg_len*3+1,:);
+    tail_loc = pt_sp_xy(end-seg_len*3,:);
     
     % skeleton to angle, only use the length of each segments/vector
     [pt_ske, vec_len, angle_ske] = ske2ang(Frenet_k_1.xy, 1);
@@ -98,14 +92,12 @@ for ii=1:Npop_particles;
     speed_ori = Vel_norm*sign(-Vel*(Frenet_k_1.T(round(end/2),1:2))');
     
     % New skeleton prediction
-    ske_pred_speed_ori = ske_prediction(speed_ori, [pt_sp_x',pt_sp_y'], [flipud(pt_sp_x'),flipud(pt_sp_y')],head_loc, tail_loc, seg_len);
+    ske_pred_speed_ori = ske_prediction(speed_ori, pt_sp_xy, flipud(pt_sp_xy),head_loc, tail_loc, seg_len);
     
     ske_pred_1 = ske_pred_speed_ori;
     % interpolation to keep the same number of samples
     len_ske_pred = size(ske_pred_1,1);
-    len_ske_old = length(inn_x(3*seg_len+1:end-3*seg_len));
-    
-    len_ske_old
+    len_ske_old = size(inn_xy(3*seg_len+1:end-3*seg_len,:),1);
     
     [length_ske_pred_1, dis_ske_1] = pt_len(ske_pred_1);
     if len_ske_pred == len_ske_old && (max(dis_ske_1)/min(dis_ske_1)<2)
@@ -128,21 +120,21 @@ for ii=1:Npop_particles;
                 vel_i = floor((jj-1)/15)-2;
                 speed(jj) = speed_ori + vel_i * var_speed;
                 % New skeleton prediction
-                ske_pred_1 = ske_prediction(speed(jj), [pt_sp_x',pt_sp_y'], [flipud(pt_sp_x'),flipud(pt_sp_y')],head_loc, tail_loc, seg_len);
+                ske_pred_1 = ske_prediction(speed(jj), pt_sp_xy, flipud(pt_sp_xy),head_loc, tail_loc, seg_len);
             elseif jj==sub_num-1
-                ske_pred_1 = [pt_sp_x(2*seg_len+1:end-4*seg_len)',pt_sp_y(2*seg_len+1:end-4*seg_len)'];
+                ske_pred_1 = pt_sp_xy(1*seg_len+1:end-5*seg_len,:);
             elseif jj==sub_num
-                ske_pred_1 = [pt_sp_x(4*seg_len+1:end-2*seg_len)',pt_sp_y(4*seg_len+1:end-2*seg_len)'];
+                ske_pred_1 = pt_sp_xy(5*seg_len+1:end-1*seg_len,:);
             end
             % interpolation to keep the same number of samples
             len_ske_pred = size(ske_pred_1,1);
-            len_ske_old = length(inn_x(3*seg_len+1:end-3*seg_len));
+            len_ske_old = size(inn_xy(3*seg_len+1:end-3*seg_len,:),1);
             if len_ske_pred == len_ske_old && (max(dis_ske_1)/min(dis_ske_1)<2)
                 ske_pred_mv =  ske_pred_1;
             else
                 ske_pred_mv = re_interp(len_ske_pred, len_ske_old, ske_pred_1);
                 % this is slower
-                %ske_pred_tmp1 = curvspace(ske_pred_1,len_ske_old);
+                % ske_pred_tmp1 = curvspace(ske_pred_1,len_ske_old);
             end
 
             % calculate the angle of each point
@@ -181,18 +173,43 @@ for ii=1:Npop_particles;
             
             jjj = mod((jj-75),6);
             vec_len_pred_2 = vec_len_pred;
+            para_1_2 = 0.9; 
             if jjj == 1  % head segment length plus
-                vec_len_pred_2(end) = vec_len_pred_2(end)+var_len*rand(1);
+                if rand(1)<para_1_2
+                    vec_len_pred_2(end) = vec_len_pred_2(end)+var_len*rand(1);
+                else
+                    vec_len_pred_2(end-1:end) = vec_len_pred_2(end-1:end)+[var_len*rand(1);var_len*rand(1)];
+                end
             elseif jjj == 2  % head segment length minus
-                vec_len_pred_2(end) = max(vec_len_pred_2(end)-var_len*rand(1),1);
+                if rand(1)<para_1_2
+                    vec_len_pred_2(end) = max(vec_len_pred_2(end)-var_len*rand(1),1);
+                else
+                    vec_len_pred_2(end-1:end) = max(vec_len_pred_2(end-1:end)-[var_len*rand(1);var_len*rand(1)],[1;1]);
+                end
             elseif jjj == 3   % tail segment length plus
-                vec_len_pred_2(1) = vec_len_pred_2(1)+var_len*rand(1);
+                if rand(1)<para_1_2
+                    vec_len_pred_2(1) = vec_len_pred_2(1)+var_len*rand(1);
+                else
+                    vec_len_pred_2(1:2) = vec_len_pred_2(1:2)+[var_len*rand(1);var_len*rand(1)];
+                end
             elseif jjj == 4   % tail segment length minus
-                vec_len_pred_2(1) = max(vec_len_pred_2(1)-var_len*rand(1),1);
+                if rand(1)<para_1_2
+                    vec_len_pred_2(1:2) = max(vec_len_pred_2(1:2)-[var_len*rand(1);var_len*rand(1)],[1;1]);
+                else
+                    vec_len_pred_2(1) = max(vec_len_pred_2(1)-var_len*rand(1),1);
+                end
             elseif jjj == 5   % all segment length plus
-                vec_len_pred_2 = vec_len_pred_2 + var_len*rand(1)/length(vec_len_pred_2);
+                if rand(1)<para_1_2
+                    vec_len_pred_2 = vec_len_pred_2 + (var_len*rand(1))/length(vec_len_pred_2);
+                else
+                    vec_len_pred_2 = vec_len_pred_2 + (2*var_len*rand(1))/length(vec_len_pred_2);
+                end
             else             % all segment length minus
-                vec_len_pred_2 = max(vec_len_pred_2 - var_len*rand(1)/length(vec_len_pred_2),1);
+                if rand(1)<para_1_2
+                    vec_len_pred_2 = max(vec_len_pred_2 - (2*var_len*rand(1))/length(vec_len_pred_2),1);
+                else
+                    vec_len_pred_2 = max(vec_len_pred_2 - var_len*rand(1)/length(vec_len_pred_2),1);
+                end
             end
         elseif jj>93 && jj<96
             % jj=93,96 are for middle point shift

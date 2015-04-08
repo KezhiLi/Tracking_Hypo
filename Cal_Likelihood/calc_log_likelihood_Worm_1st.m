@@ -77,17 +77,19 @@ B = - 0.5 / (Xstd_rgb.^2);
 
 %% Compare new frame and hypotheses
 
+area_hypo_ori = zeros(Npix_h,0)*zeros(0,Npix_w);
+
 for ii = 1:Npop_particles;
     for jj = 1:sub_num;
 
-        area_hypo = zeros(Npix_h,0)*zeros(0,Npix_w);
+        area_hypo = area_hypo_ori;
  
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);
         % points on contour to contour
-        [worm_shape_x, worm_shape_y] = shape2curv(worm_contour1, 0.5, t,ts,size(area_hypo));
+        [worm_shape_x, worm_shape_y] = shape2curv(worm_contour1, 1, t,ts,size(area_hypo));  % 0.5
         % points in body to area in body     
-        [worm_body_x, worm_body_y] = shape2curv(worm_body, 0.7, tt, tts,size(area_hypo));
+        [worm_body_x, worm_body_y] = shape2curv(worm_body, 1, tt, tts,size(area_hypo));     % 0.7
         % indexes of all points on contour 
         area_hypo_1d = sub2ind(size(area_hypo),   worm_shape_y , worm_shape_x );
         % indexes of all points inside the contour (body)        
@@ -111,20 +113,22 @@ for ii = 1:Npop_particles;
 
             % cancel it to save time
             % BWdfill_hypo = imfill(log_reBW_hypo,  fliplr(worm_contour1(round(size(worm_contour1,1)/2),:))  );
-            BWdfill_hypo = log_reBW_hypo;
 
             %figure, imshow(BWdfill);
             %title('binary image with filled holes');
 
-            BW2_hypo = bwareaopen(BWdfill_hypo, 50); 
+            BW2_hypo = log_reBW_hypo;
+            %BW2_hypo = bwareaopen(log_reBW_hypo, 50); 
             %figure, imshow(BW2);
             %title('remove small areas');
 
             % Calculate the difference, the key step
             D = sum(sum(imabsdiff(C,BW2_hypo)))/img_ratio;  
 
-            D2 = D' * D;
-
+            D2 = D^2;
+            
+            XX{ii,jj}.D = D;
+            
             % Calculate the likelihood
             L((ii-1)*sub_num+jj) =  A + B * D2;
         else

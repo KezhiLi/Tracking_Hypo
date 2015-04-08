@@ -1,4 +1,4 @@
-function [TT,NN] = frenet_TN(x,y,z),
+function [TT,NN] = frenet_TN(x,y,z)
 % FRENET_TN - Frenet-Serret Space Curve Invarients
 % A modified simpler version of Frenet, to accelerate the process
 %   
@@ -54,33 +54,41 @@ y = y(:);
 z = z(:);
 
 % SPEED OF CURVE
-dx = gradient(x);
-dy = gradient(y);
-dz = gradient(z);
-dr = [dx dy dz];
+% dx = gradient(x);
+% dy = gradient(y);
+% dz = gradient(z);
+% dr = [dx dy dz];
 
-% ddx = gradient(dx);
-% ddy = gradient(dy);
-% ddz = gradient(dz);
-% ddr = [ddx ddy ddz];
-
+dx1 = DGradient(x,length(x),1, '1stOrder');
+dy1 = DGradient(y,length(y),1, '1stOrder');
+dz1 = DGradient(z,length(z),1, '1stOrder');
+dr1 = [dx1 dy1 dz1];
 
 
 % TANGENT
-TT = dr;
-T = dr./mag(dr,3);
+% TT = dr;
+% T = dr./mag(dr,3);
 
+TT = dr1;
+%T1 = dr1./mag(dr1,3);
 
 % DERIVIATIVE OF TANGENT
-dTx =  gradient(T(:,1));
-dTy =  gradient(T(:,2));
-dTz =  gradient(T(:,3));
+% dTx =  gradient(T(:,1));
+% dTy =  gradient(T(:,2));
+% dTz =  gradient(T(:,3));
+% dT = [dTx dTy dTz];
 
-dT = [dTx dTy dTz];
+size_T1 = size(TT,1);
+dTx1 = DGradient(TT(:,1),size_T1,1, '1stOrder');
+dTy1 = DGradient(TT(:,2),size_T1,1, '1stOrder');
+dTz1 = DGradient(TT(:,3),size_T1,1, '1stOrder');
+dT1 = [dTx1 dTy1 dTz1];
 
 
 % NORMAL
-NN = dT;
+NN = dT1./mag(dT1,3);
+
+
 % N = dT./mag(dT,3);
 % % BINORMAL
 % B = cross(T,N);

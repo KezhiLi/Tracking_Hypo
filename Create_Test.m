@@ -1,7 +1,7 @@
 
-workingDir = 'S:\Kezhi\Video_Sample\02_2015';
+workingDir = 'N:\Kezhi\Video_Sample\02_2015';
 
-filename = 'S:\GeckoVideo\Compressed\20150216\CaptureTest_90pc_Ch1_16022015_174636.hdf5';
+filename = 'N:\GeckoVideo\Compressed\20150216\CaptureTest_90pc_Ch1_16022015_174636.hdf5';
 
 if ~exist('infoFile', 'var')
     infoFile =  h5info(filename);
@@ -15,10 +15,10 @@ writerObj = VideoWriter(fname);
 open(writerObj);
 
  
-image = h5read(filename, '/mask', [1,1,1], chunkSize);
+image = h5read(filename, '/mask', [1,1,2001], chunkSize);
 [~, rect] = imcrop(image);
 figure,
-for frame_number = 1:2:2000;
+for frame_number = 2002:2:3000;
     image = h5read(filename, '/mask', [1,1,frame_number], chunkSize);
     img_rect = imcrop(image, rect);
     img_rect(img_rect<1)=195;

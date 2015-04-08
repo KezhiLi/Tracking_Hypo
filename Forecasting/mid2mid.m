@@ -29,7 +29,11 @@ function [mid_hypo] = mid2mid(ske, pt_ske, mid_start, var_ske_direc, var_direc)
 
 
 pt_mid = pt_ske(mid_start,:);
-mid_ind = find(ismember(ske, pt_mid,'rows')==1);
+pt_mid_mtx = [ones(size(ske,1),1)*pt_mid(1), ones(size(ske,1),1)*pt_mid(2)];
+diff = sum(abs(ske-pt_mid_mtx),2);
+[diff_seq diff_idx] = sort(diff,'ascend');
+
+mid_ind = diff_idx(1);
 
 % debug use
 if length(mid_ind)>1

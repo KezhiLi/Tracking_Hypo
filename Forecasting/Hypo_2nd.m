@@ -36,14 +36,13 @@ for ii=1:Npop_particles;
     % the extension curve, which is a combination of spline and linear
     % curves. (spline only seems weird sometimes)
 
-    pt_sp_x = spline(t,Frenet_k_1.xy(:,1),ts);
-    pt_sp_y = spline(t,Frenet_k_1.xy(:,2),ts);
+    pt_sp_xy = interp1(t,Frenet_k_1.xy,ts,'spline');
    
     
     % the number '3' comes from 'ts'. The curve extends 3 segments to both head and
     % tail directions
-    head_loc = [pt_sp_x(1),pt_sp_y(1)];
-    tail_loc = [pt_sp_x(end),pt_sp_y(end)];
+    head_loc = pt_sp_xy(1,:);
+    tail_loc = pt_sp_xy(end,:);
 
     %% parameters
     
@@ -59,7 +58,7 @@ for ii=1:Npop_particles;
     speed_2nd = 0;
     
     % New skeleton prediction
-    ske_pred_speed_ori = ske_prediction(speed_2nd, [pt_sp_x',pt_sp_y'], [flipud(pt_sp_x'),flipud(pt_sp_y')],head_loc, tail_loc, seg_len);
+    ske_pred_speed_ori = ske_prediction(speed_2nd, pt_sp_xy, flipud(pt_sp_xy),head_loc, tail_loc, seg_len);
 
     ske_pred_1 = ske_pred_speed_ori;
    
@@ -111,6 +110,7 @@ for ii=1:Npop_particles;
         
         % omega is the radial swing velocity
         XX{ii,jj}.omg = omg(jj); 
+        XX{ii,jj}.D = 0;
 
     end % end of jj
 

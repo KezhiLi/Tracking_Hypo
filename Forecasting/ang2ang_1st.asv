@@ -20,8 +20,8 @@ end
 mid_start = round(len_ang/2);
 mid_end = mid_start+1;
 
-ang_head_chg = ang_head_i * [0.1,0.2,0.28,0.36]';
-ang_tail_chg = ang_tail_i * [0.36,0.28,0.2,0.1]';
+ang_head_chg = ang_head_i * [0.15,0.25,0.4,0.55]';
+ang_tail_chg = ang_tail_i * [0.65,0.5,0.4,0.2]';
 
 % These two are designed functions for variances of tha angle change
 distr =  (exp(-0.5*(len_ang-(1:len_ang))))';   % -0.9

@@ -21,12 +21,12 @@
 %% Parameters
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_14\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_15\.'));
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm_coil_31Mar15-0(3-50-100).gif';
-fname = ['results\testworm_coil_0(3-50-100)',date,'.avi' ];
+filename = 'results\testworm_coil_07Apr15-21(3.5-50-100).gif';
+fname = ['results\testworm_coil_21(3.5-50-100)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
@@ -61,7 +61,7 @@ var_speed = 7; % 5
 var_len   = 10;
 
 % the width of the worm (pixels= width *2)
-width = 3.5; % 3.5      Frenet_1903.mat: 3; 
+width = 3.5; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
 para_thre = 0.82;   % coil: 0.80  normal: 0.92
 
 % length max, min    
@@ -95,13 +95,12 @@ worm_show = X{1}.xy;
 
 
 % k represent the index of frame image
-for k = 3:Nfrm_movie
+for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
     % Getting Image
     Y_k = read(vr, k);
     
-    
-  
+
     %% 1st layer
     %XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
     
@@ -125,26 +124,24 @@ for k = 3:Nfrm_movie
 
     
     % Calculating Log Likelihood
-    [L, C_k] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C_k, width, seg_len, para_thre, size_blk);
+    [L, C_k, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C_k, width, seg_len, para_thre, size_blk);
       
     % Resampling
     X  = resample_particles_Worm(XX, L);
-    
-    
     
     % hold on 
 
     % Weighted averaging best tt result to obtain the worm_show
     tt =3;
-    ind = 1;
-    [worm_show, X, inn_result(k)] = calculate_estimated_Worm(X, worm_show,  C_k, width,tt, seg_len, ind);
+    ind = 0;
+    [worm_show, X, inn_result(k)] = calculate_estimated_Worm(X, worm_show,  C_k, width,tt, seg_len, ind+1, size_blk);
     
-    show_Worm(worm_show, Y_k, width, seg_len, ind);
+    show_Worm(worm_show, Y_k, width, seg_len, ind, inn_result(k),1);
     
     for ii = 5:-1:1;
         ind = ii;
     % Show the estimated worm body (worm_show)
-        show_Worm(X{ind}.xy, Y_k, width, seg_len, ind);
+        show_Worm(X{ind}.xy, Y_k, width, seg_len, ind, X{ind}.D, 7-ind, inn_result);
     end
     
     C_k_outline = bwperim(C_k);
