@@ -113,7 +113,11 @@ worm_shape = [xy_N; flipud(xy_flipN)];
 % 0,0.25,0.5,0.75,1, five curves to fill the body
 
 worm_body =worm_shape;
-for jj = 0.75:-0.25:0.25;
+
+div = floor(W_bar + 1);
+div_rev = 1/div;
+
+for jj = (1-div_rev):-div_rev:div_rev;
     worm_body = [worm_body; xy + jj*width];
     worm_body = [worm_body; flipud(xy - jj*width)];
 end

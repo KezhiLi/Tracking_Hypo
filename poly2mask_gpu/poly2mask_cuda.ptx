@@ -1,0 +1,185 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.1\\bin/../open64/lib//be.exe
+	// nvopencc 4.1 built on 2012-01-13
+
+	//-----------------------------------------------------------
+	// Compiling c:/Temp/tmpxft_00001b60_00000000-11_poly2mask_cuda.cpp3.i (c:/Temp/ccBI#.a04592)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:64
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"c:/Temp/tmpxft_00001b60_00000000-10_poly2mask_cuda.cudafe2.gpu"
+	.file	2	"c:\program files (x86)\microsoft visual studio 10.0\vc\include\codeanalysis\sourceannotations.h"
+	.file	3	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.1\bin/../include\crt/device_runtime.h"
+	.file	4	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.1\bin/../include\host_defines.h"
+	.file	5	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.1\bin/../include\builtin_types.h"
+	.file	6	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\device_types.h"
+	.file	7	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\host_defines.h"
+	.file	8	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\driver_types.h"
+	.file	9	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\surface_types.h"
+	.file	10	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\texture_types.h"
+	.file	11	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\vector_types.h"
+	.file	12	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\builtin_types.h"
+	.file	13	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.1\bin/../include\device_launch_parameters.h"
+	.file	14	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\crt\storage_class.h"
+	.file	15	"poly2mask_cuda.cu"
+	.file	16	"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.1\bin/../include\common_functions.h"
+	.file	17	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\math_functions.h"
+	.file	18	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\math_constants.h"
+	.file	19	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\device_functions.h"
+	.file	20	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\sm_11_atomic_functions.h"
+	.file	21	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\sm_12_atomic_functions.h"
+	.file	22	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\sm_13_double_functions.h"
+	.file	23	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\sm_20_atomic_functions.h"
+	.file	24	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\sm_20_intrinsics.h"
+	.file	25	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\surface_functions.h"
+	.file	26	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\texture_fetch_functions.h"
+	.file	27	"c:\program files\nvidia gpu computing toolkit\cuda\v4.1\include\math_functions_dbl_ptx1.h"
+
+
+	.entry _Z14poly2mask_cudaPiiiPfS0_i (
+		.param .u64 __cudaparm__Z14poly2mask_cudaPiiiPfS0_i_mask,
+		.param .s32 __cudaparm__Z14poly2mask_cudaPiiiPfS0_i_nMaskPoints,
+		.param .s32 __cudaparm__Z14poly2mask_cudaPiiiPfS0_i_nPolygonEdges,
+		.param .u64 __cudaparm__Z14poly2mask_cudaPiiiPfS0_i_xs,
+		.param .u64 __cudaparm__Z14poly2mask_cudaPiiiPfS0_i_ys,
+		.param .s32 __cudaparm__Z14poly2mask_cudaPiiiPfS0_i_height)
+	{
+	.reg .u16 %rh<4>;
+	.reg .u32 %r<30>;
+	.reg .u64 %rd<8>;
+	.reg .f32 %f<25>;
+	.reg .pred %p<12>;
+	.loc	15	7	0
+$LDWbegin__Z14poly2mask_cudaPiiiPfS0_i:
+	mov.u16 	%rh1, %nctaid.x;
+	mov.u16 	%rh2, %ctaid.y;
+	mul.wide.u16 	%r1, %rh1, %rh2;
+	cvt.u32.u16 	%r2, %ctaid.x;
+	add.u32 	%r3, %r2, %r1;
+	cvt.u32.u16 	%r4, %ntid.x;
+	mul.lo.u32 	%r5, %r4, %r3;
+	cvt.u32.u16 	%r6, %tid.x;
+	add.u32 	%r7, %r6, %r5;
+	ld.param.s32 	%r8, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_nPolygonEdges];
+	ld.param.s32 	%r9, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_nMaskPoints];
+	set.le.u32.s32 	%r10, %r9, %r7;
+	neg.s32 	%r11, %r10;
+	mov.s32 	%r12, 2;
+	set.le.u32.s32 	%r13, %r8, %r12;
+	neg.s32 	%r14, %r13;
+	or.b32 	%r15, %r11, %r14;
+	mov.u32 	%r16, 0;
+	setp.eq.s32 	%p1, %r15, %r16;
+	@%p1 bra 	$Lt_0_7938;
+	bra.uni 	$LBB18__Z14poly2mask_cudaPiiiPfS0_i;
+$Lt_0_7938:
+	.loc	15	12	0
+	mov.u32 	%r17, 0;
+	.loc	15	7	0
+	ld.param.s32 	%r8, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_nPolygonEdges];
+	.loc	15	12	0
+	setp.le.s32 	%p2, %r8, %r17;
+	@%p2 bra 	$Lt_0_9986;
+	ld.param.s32 	%r18, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_height];
+	rem.s32 	%r19, %r7, %r18;
+	div.s32 	%r20, %r7, %r18;
+	.loc	15	7	0
+	ld.param.s32 	%r8, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_nPolygonEdges];
+	.loc	15	12	0
+	mov.s32 	%r21, %r8;
+	ld.param.u64 	%rd1, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_xs];
+	ld.param.u64 	%rd2, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_ys];
+	cvt.rn.f32.s32 	%f1, %r19;
+	mov.s32 	%r22, 0;
+	mov.s32 	%r23, 0;
+	mov.s32 	%r24, %r21;
+$Lt_0_8962:
+ //<loop> Loop body line 12, nesting depth: 1, estimated iterations: unknown
+	.loc	15	23	0
+	ld.global.f32 	%f2, [%rd1+0];
+	.loc	15	24	0
+	ld.global.f32 	%f3, [%rd2+0];
+	.loc	15	26	0
+	ld.global.f32 	%f4, [%rd1+4];
+	.loc	15	27	0
+	ld.global.f32 	%f5, [%rd2+4];
+	.loc	15	23	0
+	setp.ge.f32 	%p3, %f1, %f3;
+	@!%p3 bra 	$Lt_0_10242;
+	setp.lt.f32 	%p4, %f1, %f5;
+	@!%p4 bra 	$Lt_0_10242;
+	.loc	15	31	0
+	add.s32 	%r25, %r23, 1;
+	cvt.rn.f32.s32 	%f6, %r20;
+	sub.f32 	%f7, %f6, %f2;
+	sub.f32 	%f8, %f5, %f3;
+	mul.f32 	%f9, %f7, %f8;
+	sub.f32 	%f10, %f1, %f3;
+	sub.f32 	%f11, %f4, %f2;
+	mul.f32 	%f12, %f10, %f11;
+	sub.f32 	%f13, %f12, %f9;
+	mov.f32 	%f14, 0f00000000;    	// 0
+	setp.gt.f32 	%p5, %f13, %f14;
+	selp.s32 	%r23, %r25, %r23, %p5;
+	bra.uni 	$Lt_0_10754;
+$Lt_0_10242:
+$L_0_6914:
+	.loc	15	36	0
+	setp.ge.f32 	%p6, %f1, %f5;
+	@!%p6 bra 	$Lt_0_10754;
+	setp.lt.f32 	%p7, %f1, %f3;
+	@!%p7 bra 	$Lt_0_10754;
+	.loc	15	38	0
+	sub.s32 	%r26, %r23, 1;
+	cvt.rn.f32.s32 	%f15, %r20;
+	sub.f32 	%f16, %f15, %f2;
+	sub.f32 	%f17, %f5, %f3;
+	mul.f32 	%f18, %f16, %f17;
+	sub.f32 	%f19, %f1, %f3;
+	sub.f32 	%f20, %f4, %f2;
+	mul.f32 	%f21, %f19, %f20;
+	sub.f32 	%f22, %f21, %f18;
+	mov.f32 	%f23, 0f00000000;    	// 0
+	setp.lt.f32 	%p8, %f22, %f23;
+	selp.s32 	%r23, %r26, %r23, %p8;
+$Lt_0_10754:
+$L_0_7426:
+$L_0_6658:
+	.loc	15	36	0
+	add.s32 	%r22, %r22, 1;
+	add.u64 	%rd2, %rd2, 4;
+	add.u64 	%rd1, %rd1, 4;
+	.loc	15	7	0
+	ld.param.s32 	%r8, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_nPolygonEdges];
+	.loc	15	36	0
+	setp.ne.s32 	%p9, %r22, %r8;
+	@%p9 bra 	$Lt_0_8962;
+	bra.uni 	$Lt_0_8450;
+$Lt_0_9986:
+	mov.s32 	%r23, 0;
+$Lt_0_8450:
+	mov.u32 	%r27, 0;
+	setp.eq.s32 	%p10, %r23, %r27;
+	@%p10 bra 	$LBB18__Z14poly2mask_cudaPiiiPfS0_i;
+	.loc	15	48	0
+	mov.s32 	%r28, 1;
+	ld.param.u64 	%rd3, [__cudaparm__Z14poly2mask_cudaPiiiPfS0_i_mask];
+	cvt.s64.s32 	%rd4, %r7;
+	mul.wide.s32 	%rd5, %r7, 4;
+	add.u64 	%rd6, %rd3, %rd5;
+	st.global.s32 	[%rd6+0], %r28;
+$LBB18__Z14poly2mask_cudaPiiiPfS0_i:
+	.loc	15	50	0
+	exit;
+$LDWend__Z14poly2mask_cudaPiiiPfS0_i:
+	} // _Z14poly2mask_cudaPiiiPfS0_i
+

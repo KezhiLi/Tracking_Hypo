@@ -79,6 +79,8 @@ B = - 0.5 / (Xstd_rgb.^2);
 
 area_hypo_ori = zeros(Npix_h,0)*zeros(0,Npix_w);
 
+max_diff=1;
+
 for ii = 1:Npop_particles;
     for jj = 1:sub_num;
 
@@ -121,6 +123,17 @@ for ii = 1:Npop_particles;
             %BW2_hypo = bwareaopen(log_reBW_hypo, 50); 
             %figure, imshow(BW2);
             %title('remove small areas');
+            
+            
+            % debug use
+%            mask22 = poly2mask_gpu(worm_contour1(:,1),worm_contour1(:,2),Npix_h,Npix_w);
+%            mask22 = poly2mask(worm_contour1(:,1),worm_contour1(:,2),Npix_h,Npix_w);
+%             mask22(area_hypo_1d) = logical(1);
+%             diff2 = sum(sum(imabsdiff(BW2_hypo,mask22)));
+%             if diff2 > max_diff
+%                 max_diff = diff2
+%             end
+            
 
             % Calculate the difference, the key step
             D = sum(sum(imabsdiff(C,BW2_hypo)))/img_ratio;  
