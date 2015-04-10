@@ -231,11 +231,11 @@ for ii=1:Npop_particles;
             
             head_or_tail = randn(1)>0;
             if head_or_tail
-                ang_head_i = sign(randn(1));
+                ang_head_i = sign(randn(1))*2;
                 ang_tail_i = 0;
             else
                 ang_head_i = 0;
-                ang_tail_i = sign(randn(1));
+                ang_tail_i = sign(randn(1))*2;
             end
             % omg(jj) = omg(jj) + rand(1) * 0.2;
             

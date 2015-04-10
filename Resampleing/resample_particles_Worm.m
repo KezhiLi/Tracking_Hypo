@@ -37,7 +37,10 @@ hist_I_unq = histc(I,I_unq);
 % sort the histogram
 [sorted_hist_I, index] = sort(hist_I_unq,'descend'); 
 
-sorted_I = I_unq(index(1:round(N/sub_num)));
+if length(index)< N_particles
+    index = [index, ones(1,N_particles-length(index))*index(1)];
+end
+sorted_I = I_unq(index(1:N_particles));
 % only keep the entires with highest samples
 mask_sort = zeros(1,length(Q));
 mask_sort(sorted_I) = 1;

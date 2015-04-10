@@ -33,8 +33,18 @@ worm_shape_xy(worm_shape_xy(:,2)>siz(1),2)=siz(1);
 
 % Output values
 worm_shape_xy = round(worm_shape_xy);
+
 worm_shape_x = worm_shape_xy(:,1);
 worm_shape_y = worm_shape_xy(:,2);
+
+% % delete duplicated continues points
+% ind_haf = round(size(worm_shape_xy,1)/2);
+% worm_shape_xy_unq1 = unique(worm_shape_xy(1:ind_haf,:),'rows','stable');
+% worm_shape_xy_unq2 = unique(worm_shape_xy(ind_haf+1:end,:),'rows','stable');
+% worm_shape_xy_unq = [worm_shape_xy_unq1;worm_shape_xy_unq2];
+% 
+% worm_shape_x = worm_shape_xy_unq(:,1);
+% worm_shape_y = worm_shape_xy_unq(:,2);
 
 
 

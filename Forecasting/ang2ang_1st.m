@@ -1,11 +1,20 @@
 function [ang_hypo, mid_start, omg] = ang2ang_1st(ang, ang_head_i,ang_tail_i ,omg,jj)
+% function used to generate angle hypothesis for 1st layer of hypothesis
+%
+% Input:   ang: an M*1 vector, the original angle 
+%          ang_head_i: a scalar, a parameter regarding head angle variance   
+%          ang_tail_i: a scalar, a parameter regarding tail angle variance
+%          omg: a scalar, the first derivative of angle, obtained from last iteration 
+%          jj: a scalar, the index of sub hypothesis
+% Output:  ang_hypo: an M*1 vector, the hypothesis angle
+%          mid_start: a scalar, the index of the 1st point of the middle segment
+%          omg: a scalar, the current omega, which is the the first derivative of angle
 % 
-% 
-% 
-% 
-% 
-% 
-% 
+% Copyrighit: author: Kezhi Li, CSC, MRC, Imperial College, London
+% 10/04/2015
+% You will not remove any copyright or other notices from the Software; 
+% you must reproduce all copyright notices and other proprietary 
+% notices on any copies of the Software.
 
 
 
@@ -21,7 +30,7 @@ mid_start = round(len_ang/2);
 mid_end = mid_start+1;
 
 ang_head_chg = ang_head_i * [0.15,0.25,0.4,0.55]';
-ang_tail_chg = ang_tail_i * [0.65,0.5,0.4,0.2]';
+ang_tail_chg = ang_tail_i * [0.75,0.55,0.4,0.2]';
 
 % These two are designed functions for variances of tha angle change
 distr =  (exp(-0.5*(len_ang-(1:len_ang))))';   % -0.9

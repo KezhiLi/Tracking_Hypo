@@ -31,10 +31,12 @@ m_fre_pt = size(X{1,1}.xy,1);
 % points for extension in contour
 t = 1:2*m_fre_pt ;
 ts = 1:1/(seg_len*2):2*m_fre_pt;
-% points for extension in body, which consist of 9 curves on and inside
+% points for extension in body, which consist of total_seg (eg. 9) curves on and inside
 % the body contour
-t2 = 1:9*m_fre_pt ;
-ts2 = 1:1/(seg_len*2):9*m_fre_pt;
+div = floor(width + 1);
+total_seg = (div+1)*2-1;
+t2 = 1:total_seg*m_fre_pt ;
+ts2 = 1:1/(seg_len*2):total_seg*m_fre_pt;
 
 worm_ske = X{ind}.xy;
 % result is calculated from weighted averaging top tt hypotheses 

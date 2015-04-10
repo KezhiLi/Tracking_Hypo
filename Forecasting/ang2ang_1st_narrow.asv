@@ -1,14 +1,11 @@
 function [ang_hypo, mid_start, omg] = ang2ang_1st_narrow(ang, ang_head_i,ang_tail_i ,omg)
-% function used to generate angle hypothesis for specific model
-%
+% function used to generate angle hypothesis
 % Input:   ang: an M*1 vector, the original angle 
 %          ang_head_i: a scalar, a parameter regarding head angle variance   
 %          ang_tail_i: a scalar, a parameter regarding tail angle variance
 %          omg: a scalar, the first derivative of angle, obtained from last iteration 
-% Output:  ang_hypo: an M*1 vector, the hypothesis angle
-%          mid_start: a scalar, the index of the 1st point of the middle segment
-%          omg: a scalar, the current omega, which is the the first derivative of angle
-%
+% Output:  ang_hypo: an M*1 vector, the hypothesis angle,
+% 
 % Copyrighit: author: Kezhi Li, CSC, MRC, Imperial College, London
 % 10/04/2015
 % You will not remove any copyright or other notices from the Software; 

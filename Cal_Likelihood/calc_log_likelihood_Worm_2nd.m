@@ -41,8 +41,10 @@ B = - 0.5 / (Xstd_rgb.^2);
     ts = 1:1/(seg_len*2):2*m_fre_pt;
     
     % 'tt','tts' for all points inside the contour
-    tt = 1:9*m_fre_pt ;
-    tts = 1:1/(seg_len*2):9*m_fre_pt;
+    div = floor(width + 1);
+    total_seg = (div+1)*2-1;
+    tt = 1:total_seg*m_fre_pt ;
+    tts = 1:1/(seg_len*2):total_seg*m_fre_pt;
     
     img_ratio = sum(sum(C))/700; 
 
@@ -67,6 +69,26 @@ for ii = 1:Npop_particles;
         mask_head = square_mtx_fast(mask_ori, XX{ii,jj}.xy(end-1,:), size_blk);
         mask = square_mtx_fast(mask_head, XX{ii,jj}.xy(2,:), size_blk);    
         
+        % number of points on the skeleton
+        ske_num = (m_fre_pt-1) * (2*seg_len) + 1;
+        % curve of skeleton, it was obtained from the shape_x and shape_y
+        ske_curv = [ worm_shape_x(end-ske_num+1:end), worm_shape_y(end-ske_num+1:end)];
+        % compare the first 1/3 segment and last 1/3 segment part of the worm, save the
+        % number of points on the skeleton that are repeated in both
+        % segement. The number is used in calculating the difference. 
+        third_ske_num = round(ske_num/3);
+        tail_1third_curv = ske_curv(1:third_ske_num,:);
+        head_1third_curv = ske_curv(end-third_ske_num+1:end,:);
+        % comparing to 'intersect', the following method is faster to count
+        % the number of duplicated points
+        tail_1third_sorted = sort(tail_1third_curv);
+        head_1third_sorted = sort(head_1third_curv);
+        dup_points = tail_1third_sorted(ismember(tail_1third_sorted,head_1third_sorted,'rows'),:);
+        
+        if size(dup_points,1)>1
+            dup_points
+        end
+        
         I = (min(worm_shape_y) >= 1 & max(worm_shape_y) <= Npix_h);
         J = (min(worm_shape_x) >= 1 & max(worm_shape_x) <= Npix_w);
 
@@ -84,16 +106,13 @@ for ii = 1:Npop_particles;
             % cancel it to save time
             % BWdfill_hypo = imfill(log_reBW_hypo,  fliplr(worm_contour1(round(size(worm_contour1,1)/2),:))  );
 
-            %figure, imshow(BWdfill);
-            %title('binary image with filled holes');
-
             BW2_hypo = log_reBW_hypo;
             % BW2_hypo = bwareaopen(log_reBW_hypo, 50); 
             %figure, imshow(BW2);
             %title('remove small areas');
 
             % Calculate the difference, the key step
-            D = sum(sum(imabsdiff(C,BW2_hypo).*mask))/img_ratio; 
+            D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*25)/img_ratio; 
             
 
             D2 = D^2;
