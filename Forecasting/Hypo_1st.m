@@ -34,7 +34,7 @@ var_ske_direc = 0; %3;
 var_direc = 0; %3;
 
 % the location variance of the middle point of the worm spline
-var_mid = 2;
+var_mid = 0.25;
 
 % loop for every particle, generate sub_num sub-particles, in which
 for ii=1:Npop_particles;

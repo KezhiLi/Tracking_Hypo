@@ -78,12 +78,12 @@ for ii=1:Npop_particles;
             mid_hypo = mid2mid(ske_pred_1, pt_ske_pred, mid_start, var_ske_direc, var_direc);
             
             if jj > jj_4 - 3
-                if jj == jj-2
-                    [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2,0.2*ave_vec_len_pred);
+                if jj == jj_4-2
+                    [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2, 0.2*ave_vec_len_pred);
                     mid_hypo = pt_ske_pred(mid_start,:)+[X_mid, Y_mid];
-                elseif jj == jj-1
-                    [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2,0.2*ave_vec_len_pred);
-                    ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,-1);
+                elseif jj == jj_4-1
+                    [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2, 0.2*ave_vec_len_pred);
+                    mid_hypo = pt_ske_pred(mid_start,:)-[X_mid, Y_mid];
                 elseif jj < jj_4 + scenario(5)/2
                     vec_len_pred(1:2) = max( vec_len_pred(1:2) + rand(1) * var_len_tail * [1;1],[1;1]);
                 else 

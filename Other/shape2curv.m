@@ -32,7 +32,7 @@ worm_shape_xy(worm_shape_xy(:,1)>siz(2),1)=siz(2);
 worm_shape_xy(worm_shape_xy(:,2)>siz(1),2)=siz(1);
 
 % Output values
-worm_shape_xy = round(worm_shape_xy);
+%worm_shape_xy = round(worm_shape_xy);
 
 worm_shape_x = worm_shape_xy(:,1);
 worm_shape_y = worm_shape_xy(:,2);

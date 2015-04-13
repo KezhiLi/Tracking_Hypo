@@ -25,8 +25,8 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm2_13Apr15-1(3-50-100).gif';
-fname = ['results\testworm2_1(3-50-100)',date,'.avi' ];
+filename = 'results\testworm2_13Apr15-2(3-50-100).gif';
+fname = ['results\testworm2_2(3-50-100)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
@@ -56,7 +56,7 @@ sub_num_2 = 50;
 % the length (pixels) of each segment of the skeleton (this value relates to Frenet_Coil)
 seg_len = 8;  % 8 
 
-% the proximated various of the image (0~255)
+% the estimated variance of the image (0~255)
 Xstd_rgb =  75; % 40
 % the first derivative of the worm velocity (pixels/second)
 var_speed = 4; % 5
@@ -110,7 +110,7 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
     % Indication purpose 
     k
-    if mod(k,15)==0
+    if mod(k,15)==0&&k>250
         k
     end
     

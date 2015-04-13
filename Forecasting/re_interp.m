@@ -10,6 +10,11 @@ qq = 1:((len_ske_pred-1)/(len_ske_old-1)):len_ske_pred;
 ske_pred_xy = interp1(pp,ske_pred_1,qq,'spline');
 ske_pred_2 = ske_pred_xy;
 
+% debug use 
+if isempty(ske_pred_2)
+    ske_pred_1
+end
+
 qq2 = zeros(len_ske_old,1);
 qq3 = zeros(len_ske_old,1);
 [length_ske_pred, dis_ske] = pt_len(ske_pred_2);
