@@ -1,4 +1,4 @@
-function [L,C, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C, width, seg_len,para_thre, size_blk)
+function [L,C, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C, width, seg_len, size_blk, len_min)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
@@ -30,6 +30,9 @@ N = Npop_particles*sub_num;
 % likelihood vector
 L = zeros(1,N);
 
+% overlap penalty
+op = 30;
+
 %% likelihood equation
 
 A = -log(sqrt(2 * pi) * Xstd_rgb);
@@ -54,6 +57,8 @@ for ii = 1:Npop_particles;
     for jj = 1:sub_num;
 
         area_hypo = zeros(Npix_h,0)*zeros(0,Npix_w);
+        
+        
  
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);
@@ -67,7 +72,9 @@ for ii = 1:Npop_particles;
         area_hypo_1d_inside = sub2ind(size(area_hypo),   worm_body_y , worm_body_x );
         
         mask_head = square_mtx_fast(mask_ori, XX{ii,jj}.xy(end-1,:), size_blk);
-        mask = square_mtx_fast(mask_head, XX{ii,jj}.xy(2,:), size_blk);    
+        mask = square_mtx_fast(mask_head, XX{ii,jj}.xy(2,:), size_blk);  
+        
+        len_worm = pt_len(worm_body(end-m_fre_pt+1:end,:))-len_min;
         
         % number of points on the skeleton
         ske_num = (m_fre_pt-1) * (2*seg_len) + 1;
@@ -112,7 +119,7 @@ for ii = 1:Npop_particles;
             %title('remove small areas');
 
             % Calculate the difference, the key step
-            D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*30)/img_ratio; 
+            D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*op + len_worm)/img_ratio; 
             
 
             D2 = D^2;

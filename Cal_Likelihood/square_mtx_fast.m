@@ -14,6 +14,6 @@ right =round(min(pt(1)+len,Y_2));
 bottom = round(max(pt(2)-len,1));
 top = round(min(pt(2)+len,Y_1));
 
-dis_mtx(bottom:top,left:right) = 2;
+dis_mtx(bottom:top,left:right) = 1.5;
 
 

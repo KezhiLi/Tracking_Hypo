@@ -194,9 +194,9 @@ for ii=1:Npop_particles;
                 end
             elseif jjj == 4   % tail segment length minus
                 if rand(1)<para_1_2
-                    vec_len_pred_2(1:2) = max(vec_len_pred_2(1:2)-[var_len*rand(1);var_len*rand(1)],[1;1]);
-                else
                     vec_len_pred_2(1) = max(vec_len_pred_2(1)-var_len*rand(1),1);
+                else
+                    vec_len_pred_2(1:2) = max(vec_len_pred_2(1:2)-[var_len*rand(1);var_len*rand(1)],[1;1]);
                 end
             elseif jjj == 5   % all segment length plus
                 if rand(1)<para_1_2
@@ -212,7 +212,8 @@ for ii=1:Npop_particles;
                 end
             end
         elseif jj>93 && jj<96
-            % jj=93,96 are for middle point shift
+            % jj=93,96 are for middle point shift, pi/2 means swing 90
+            % degree to the perpendicular direction
             [X_mid, Y_mid] =  pol2cart(ang_hypo(mid_start)+pi/2,0.2*ave_vec_len_pred);
             if jj==94
                 % new coordinates of the middle point
@@ -242,6 +243,9 @@ for ii=1:Npop_particles;
             % calculate the angle hypothesis. The angles can be changed
             % here are only first/last two points near tail/head.
             [ang_hypo,mid_start, omg(jj)] = ang2ang_1st_narrow(angle_ske_pred, ang_head_i,ang_tail_i ,omg(jj));
+        else
+            omg(jj) = omg(jj) + rand(1) * 0.2;
+            [ang_hypo,mid_start, omg(jj)] = ang2ang_1st(angle_ske_pred, ang_head_i,ang_tail_i ,omg(jj),jj);
         end
         
         if jj~=94&& jj ~=95

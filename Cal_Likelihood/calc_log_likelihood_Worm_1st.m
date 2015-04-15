@@ -28,6 +28,9 @@ N = Npop_particles*sub_num;
 % likelihood vector
 L = zeros(1,N);
 
+% overlap penalty
+op = 20;
+
 %% image processing to thresholding
 Y = rgb2gray(Y);
 II = 255 - Y;
@@ -145,7 +148,9 @@ for ii = 1:Npop_particles;
             %title('remove small areas');            
 
             % Calculate the difference, the key step
-            D = (sum(sum(imabsdiff(C,BW2_hypo)))+size(dup_points,1)*20)/img_ratio;  
+            diff_abs = imabsdiff(C,BW2_hypo);
+            diff_abs_op = imopen(diff_abs,se);
+            D = (sum(sum(diff_abs+diff_abs_op*2)/2)+size(dup_points,1)*op)/img_ratio;  
 
             D2 = D^2;
             
