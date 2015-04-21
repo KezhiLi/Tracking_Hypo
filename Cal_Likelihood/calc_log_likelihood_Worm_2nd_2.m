@@ -1,4 +1,4 @@
-function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_len,  para_thre)
+function [L,C, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C, II, width, seg_len, size_blk, len_min)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
@@ -15,8 +15,10 @@ function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_le
 % notices on any copies of the Software.
 
 % size of image
-Npix_h = size(Y, 1);
-Npix_w = size(Y, 2);
+Npix_h = size(C, 1);
+Npix_w = size(C, 2);
+
+mask_ori = ones(Npix_h,1)*ones(1,Npix_w);
 
 % number of paricles and sub-particles
 Npop_particles = size(XX,1);
@@ -28,40 +30,13 @@ N = Npop_particles*sub_num;
 % likelihood vector
 L = zeros(1,N);
 
+%edge
+BW_l = edge(II,'log');
+       
 % overlap penalty
-op = 20;
-
-%% image processing to thresholding
-Y = rgb2gray(Y);
-II = 255 - Y;
-
-% imclose
-se = strel('disk', 1);
-II = imclose(II, se);
-
-%figure, hist(double(I),256); 
-
-% we set an artificial parameter 0.0.8 here % coil: 0.9  normal: 0.8
-level = graythresh(II)* para_thre;
-BW = im2bw(II,level);
-%figure, imshow(BW)
-
-reBW = BW;
-%reBW = imerode(BW,se);  %reBW = BW;
-% reBW = -im2bw(I,level)+1;
-% figure, imshow(reBW)
-
-log_reBW = logical(reBW);
-
-BWdfill = log_reBW;
-%BWdfill = imfill(log_reBW, 'holes');
-%figure, imshow(BWdfill);
-%title('binary image with filled holes');
-
-C = bwareaopen(BWdfill, 50); 
-%figure, imshow(BW2);
-%title('remove small areas');
-
+op1 = 30;
+op2 = 2;
+op3 = 2;
 
 %% likelihood equation
 
@@ -83,25 +58,28 @@ B = - 0.5 / (Xstd_rgb.^2);
 
 %% Compare new frame and hypotheses
 
-area_hypo_ori = logical(zeros(Npix_h,0)*zeros(0,Npix_w));
-
-max_diff=1;
-
 for ii = 1:Npop_particles;
     for jj = 1:sub_num;
-
-        area_hypo = area_hypo_ori;
- 
+        % initiate the hypotheses matrix. comparing to
+        % zeros(Npix_h,Npix_w), it's faster.
+        area_hypo = zeros(Npix_h,0)*zeros(0,Npix_w);
+        area_hypo_edge = area_hypo;
+        
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);
         % points on contour to contour
         [worm_shape_x, worm_shape_y] = shape2curv(worm_contour1, 1, t,ts,size(area_hypo));  % 0.5
         % points in body to area in body     
-        [worm_body_x, worm_body_y] = shape2curv(worm_body, 1, tt, tts,size(area_hypo));     % 0.7
+        [worm_body_x, worm_body_y] = shape2curv(worm_body, 1, tt, tts,size(area_hypo));    % 0.7
         % indexes of all points on contour 
         area_hypo_1d = sub2ind(size(area_hypo),   worm_shape_y , worm_shape_x );
         % indexes of all points inside the contour (body)        
         area_hypo_1d_inside = sub2ind(size(area_hypo),   worm_body_y , worm_body_x );
+        
+        mask_head = square_mtx_fast(mask_ori, XX{ii,jj}.xy(end-1,:), size_blk);
+        mask = square_mtx_fast(mask_head, XX{ii,jj}.xy(2,:), size_blk);  
+        
+        len_worm = pt_len(worm_body(end-m_fre_pt+1:end,:))-len_min;
         
         % number of points on the skeleton
         ske_num = (m_fre_pt-1) * (2*seg_len) + 1;
@@ -113,7 +91,7 @@ for ii = 1:Npop_particles;
         third_ske_num = round(ske_num/3);
         tail_1third_curv = ske_curv(1:third_ske_num,:);
         head_1third_curv = ske_curv(end-third_ske_num+1:end,:);
-        % comparing to 'intersect', the following method is faster to count
+        % comparing to function 'intersect', the following method is faster to count
         % the number of duplicated points
         tail_1third_sorted = sort(tail_1third_curv);
         head_1third_sorted = sort(head_1third_curv);
@@ -122,40 +100,43 @@ for ii = 1:Npop_particles;
         if size(dup_points,1)>1
             dup_points
         end
-  
+        
+        % skeleton will not overlap with edges
+ 
+        
         I = (min(worm_shape_y) >= 1 & max(worm_shape_y) <= Npix_h);
         J = (min(worm_shape_x) >= 1 & max(worm_shape_x) <= Npix_w);
 
         if I && J
 
-            area_hypo(area_hypo_1d) =  logical(1);
-
-            area_hypo(area_hypo_1d_inside) = logical(1);
+            area_hypo(area_hypo_1d) = 1;
+            area_hypo_edge(area_hypo_1d(end-ske_num+1:end)) = 1;
+            
+            area_hypo(area_hypo_1d_inside) = 1;
 
 
             %area_hypo1 = imclose(area_hypo, se);
-            log_reBW_hypo = area_hypo;
+            area_hypo1 = area_hypo;
+            log_reBW_hypo = logical(area_hypo1);
 
             % cancel it to save time
             % BWdfill_hypo = imfill(log_reBW_hypo,  fliplr(worm_contour1(round(size(worm_contour1,1)/2),:))  );
 
-            %figure, imshow(BWdfill);
-            %title('binary image with filled holes');
-
             BW2_hypo = log_reBW_hypo;
-            %BW2_hypo = bwareaopen(log_reBW_hypo, 50); 
+            % BW2_hypo = bwareaopen(log_reBW_hypo, 50); 
             %figure, imshow(BW2);
-            %title('remove small areas');            
+            %title('remove small areas');
+            
+            diff_abs_edge = sum(sum((BW_l+ area_hypo_edge)>1.5));
 
             % Calculate the difference, the key step
-            diff_abs = imabsdiff(C,BW2_hypo);
-            diff_abs_op = imopen(diff_abs,se);
-            D = (sum(sum(diff_abs+diff_abs_op*2)/2)+size(dup_points,1)*op)/img_ratio;  
-
+            D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*op1 + ...
+                len_worm*op2 + diff_abs_edge*op3)/img_ratio; 
+            
             D2 = D^2;
             
             XX{ii,jj}.D = D;
-            
+
             % Calculate the likelihood
             L((ii-1)*sub_num+jj) =  A + B * D2;
         else

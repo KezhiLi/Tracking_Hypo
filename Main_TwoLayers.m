@@ -25,8 +25,8 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm2_15Apr15-3(3-50-100).gif';
-fname = ['results\testworm2_3(3-50-100)',date,'.avi' ];
+filename = 'results\testworm2_21Apr15-2(3-50-100).gif';
+fname = ['results\testworm2_2(3-50-100)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
@@ -110,12 +110,12 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
     % Indication purpose 
     k
-    if mod(k,15)==0&&k>130
+    if mod(k,15)==0&&k>125
         k
     end
     
     % Calculating Log Likelihood
-    [L, C_k] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y_k, width, seg_len, para_thre);
+    [L, C_k, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y_k, width, seg_len, para_thre);
       
     % Resampling
     X1  = resample_particles_Worm(XX, L);
@@ -125,7 +125,7 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
 
     % Calculating Log Likelihood
-    [L, C_k, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C_k, width, seg_len, size_blk, len_min);
+    [L, C_k, XX] = calc_log_likelihood_Worm_2nd_2(Xstd_rgb, XX, C_k, II, width, seg_len, size_blk, len_min);
       
     % Resampling
     X  = resample_particles_Worm(XX, L);

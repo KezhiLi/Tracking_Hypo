@@ -1,4 +1,4 @@
-function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_len,  para_thre)
+function [L,C] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_len,  para_thre)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
@@ -122,6 +122,10 @@ for ii = 1:Npop_particles;
         if size(dup_points,1)>1
             dup_points
         end
+        
+        % skeleton will not overlap with edges
+        BW_l = edge(II,'log');
+        
   
         I = (min(worm_shape_y) >= 1 & max(worm_shape_y) <= Npix_h);
         J = (min(worm_shape_x) >= 1 & max(worm_shape_x) <= Npix_w);
@@ -129,7 +133,7 @@ for ii = 1:Npop_particles;
         if I && J
 
             area_hypo(area_hypo_1d) =  logical(1);
-
+            
             area_hypo(area_hypo_1d_inside) = logical(1);
 
 
@@ -150,7 +154,8 @@ for ii = 1:Npop_particles;
             % Calculate the difference, the key step
             diff_abs = imabsdiff(C,BW2_hypo);
             diff_abs_op = imopen(diff_abs,se);
-            D = (sum(sum(diff_abs+diff_abs_op*2)/2)+size(dup_points,1)*op)/img_ratio;  
+            diff_abs_edge = sum(sum((BW_l+ area_hypo_edge)>1.5));
+            D = (sum(sum(diff_abs+(diff_abs_op)*2)/2)+(size(dup_points,1)+diff_abs_edge)*op)/img_ratio;  
 
             D2 = D^2;
             

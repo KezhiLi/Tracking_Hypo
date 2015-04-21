@@ -55,11 +55,10 @@ B = - 0.5 / (Xstd_rgb.^2);
 
 for ii = 1:Npop_particles;
     for jj = 1:sub_num;
-
+        % initiate the hypotheses matrix. comparing to
+        % zeros(Npix_h,Npix_w), it's faster.
         area_hypo = zeros(Npix_h,0)*zeros(0,Npix_w);
-        
-        
- 
+
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);
         % points on contour to contour
@@ -86,7 +85,7 @@ for ii = 1:Npop_particles;
         third_ske_num = round(ske_num/3);
         tail_1third_curv = ske_curv(1:third_ske_num,:);
         head_1third_curv = ske_curv(end-third_ske_num+1:end,:);
-        % comparing to 'intersect', the following method is faster to count
+        % comparing to function 'intersect', the following method is faster to count
         % the number of duplicated points
         tail_1third_sorted = sort(tail_1third_curv);
         head_1third_sorted = sort(head_1third_curv);
@@ -121,7 +120,6 @@ for ii = 1:Npop_particles;
             % Calculate the difference, the key step
             D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*op + len_worm)/img_ratio; 
             
-
             D2 = D^2;
             
             XX{ii,jj}.D = D;
