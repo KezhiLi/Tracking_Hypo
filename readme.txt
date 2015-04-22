@@ -1,11 +1,10 @@
 Readme
 
-Run the Main_Coil.m to see the tracking performance.
+Run ‘Main_TwoLayers.m’ as the main function to track the single worm (approximately
+2~3 seconds per frame, total time depends on the frame number of the video). The result is
+a tracking video with ‘.tif’ format saved in the ‘results’ folder.
 
-Change the filename accordingly to save the tracking video.
-
-If new input video needs to be processed, change 'vr' accordinly. 
-And the 'Frenet_Coil' needs to be generated based on conventional tracking algorithm to have the initial skeleton.
+Details please refer to 'User_Manual(1.0)'.
 
 See the Flow_Chart to have an idea of the functions. 
 
