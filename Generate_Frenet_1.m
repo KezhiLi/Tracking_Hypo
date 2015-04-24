@@ -25,11 +25,11 @@ clear;
 % addpath(genpath('C:\Kezhi\Software\SegWorm-master\SegWorm-master\.'));
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_16\.'));
 
 % The sample step of points on skeleton. Change it accordingly in the Main
 % function of video processing.
-samp_step = 6;
+samp_step = 8;
 
 % Input video
 %vr = VideoReader('Vedeo_coil.avi');
@@ -39,6 +39,10 @@ vr = VideoReader(fname);
 Y_1 = read(vr, 1);
 Y_2 = read(vr, 2);
 Y_3 = read(vr, 3);
+
+% threshold
+thre = 0.9;  % 0.96
+
 
 % Initialize the Frenet data (including points on skeleton, T vector, N vector, etc.)
 Frenet_Pt{1}.xy = {};
@@ -62,7 +66,7 @@ II = imclose(II, se);
 % imshow(III), title('Opening-closing (Ioc III)')
 
 %figure, hist(double(I),256);
-level = graythresh(II)*0.96;
+level = graythresh(II)*thre;  % 0.96
 BW = im2bw(II,level);
 % figure, imshow(BW)
 
@@ -237,7 +241,11 @@ quiver(Frenet_Pt{k}.xy(hf_ske_index,1),Frenet_Pt{k}.xy(hf_ske_index,2),Frenet_Pt
 
 %% Save the Frenet for future use
 Frenet_Pt{2}=Frenet_Pt{1};
-save Frenet_0904.mat Frenet_Pt
+
+frenet_name = ['.\Data_source\Frenet_',date,'.mat' ];
+
+save .\Data_source\Frenet_2304(2).mat Frenet_Pt
+%save Frenet_0904.mat Frenet_Pt
 
 
 

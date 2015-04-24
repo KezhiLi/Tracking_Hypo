@@ -21,21 +21,23 @@
 %% Parameters
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_15\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_16\.'));
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm2_13Apr15-1(3-50-100).gif';
-fname = ['results\testworm2_1(3-50-100)',date,'.avi' ];
+filename = 'results\testworm4_24Apr15-4(3-50-100).gif';
+fname = ['results\testworm4_4(3-50-100)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
-vr = VideoReader('\Sample_Video\Video_Test2.avi');
+vr = VideoReader('\Sample_Video\Video_Test4.avi');
+%vr = VideoReader('\Sample_Video\Video_Test2.avi');
 %vr = VideoReader('\Sample_Video\Video_coil.avi');
 %vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 
 % the initial state (skeleton, frenent N,T, etc)
-load Frenet_0904.mat;
+load .\Data_source\Frenet_2304(2).mat
+%load Frenet_0904.mat;
 %load Frenet_Coil;
 %load Frenet_Pt_full;
 %load Frenet_1903.mat;
@@ -57,18 +59,18 @@ sub_num_2 = 50;
 seg_len = 8;  % 8 
 
 % the estimated variance of the image (0~255)
-Xstd_rgb =  75; % 40
+Xstd_rgb =  80; % 40  % 75
 % the first derivative of the worm velocity (pixels/second)
 var_speed = 4; % 5
 var_len   = 10;
 
 % the half width of the worm (pixels= width *2)
 width = 3; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
-para_thre = 0.8;   % coil: 0.80  normal: 0.92
+para_thre = 0.76;   % coil: 0.80  normal: 0.92
 
 % length max, min    
 % Frenet_1903.mat: (88,70); Frenet_Coil.mat: (105,85);
-len_max = 85;   % 105        
+len_max = 95;   % 105        
 len_min = 70;    % 85
 size_blk = round((len_max+len_min)/12); 
 
@@ -110,22 +112,22 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
     % Indication purpose 
     k
-    if mod(k,15)==0&&k>250
+    if mod(k,15)==0&&k>125
         k
     end
     
     % Calculating Log Likelihood
-    [L, C_k] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y_k, width, seg_len, para_thre);
+    [L, C_k, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y_k, width, seg_len, para_thre);
       
     % Resampling
-    X  = resample_particles_Worm(XX, L);
+    X1  = resample_particles_Worm(XX, L);
     
     %% 2nd layer
-    XX = Hypo_2nd(N_particles, sub_num_2, var_speed, X, seg_len, len_max, len_min);
+    XX = Hypo_2nd(N_particles, sub_num_2, var_speed, X1, seg_len, len_max, len_min);
     
 
     % Calculating Log Likelihood
-    [L, C_k, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C_k, width, seg_len, para_thre, size_blk);
+    [L, C_k, XX] = calc_log_likelihood_Worm_2nd_2(Xstd_rgb, XX, C_k, II, width, seg_len, size_blk, len_min);
       
     % Resampling
     X  = resample_particles_Worm(XX, L);

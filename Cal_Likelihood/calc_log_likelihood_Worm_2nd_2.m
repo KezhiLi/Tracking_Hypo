@@ -35,8 +35,8 @@ BW_l = edge(II,'log');
        
 % overlap penalty
 op1 = 30;
-op2 = 2;
-op3 = 2;
+op2 = 1;  % at first: 2 
+op3 = 6;  % at first: 2
 
 %% likelihood equation
 
@@ -55,6 +55,8 @@ B = - 0.5 / (Xstd_rgb.^2);
     tts = 1:1/(seg_len*2):total_seg*m_fre_pt;
     
     img_ratio = sum(sum(C))/700; 
+    
+    area_hypo_zero = logical(zeros(Npix_h,0)*zeros(0,Npix_w));
 
 %% Compare new frame and hypotheses
 
@@ -62,8 +64,8 @@ for ii = 1:Npop_particles;
     for jj = 1:sub_num;
         % initiate the hypotheses matrix. comparing to
         % zeros(Npix_h,Npix_w), it's faster.
-        area_hypo = zeros(Npix_h,0)*zeros(0,Npix_w);
-        area_hypo_edge = area_hypo;
+        area_hypo = area_hypo_zero;
+        area_hypo_edge = area_hypo_zero;
         
         % skeleton to points on contour/points in body
         [worm_contour1,worm_body] = ske2shape(XX{ii,jj}.xy, XX{ii,jj}.N, width, -0.40);
@@ -83,23 +85,23 @@ for ii = 1:Npop_particles;
         
         % number of points on the skeleton
         ske_num = (m_fre_pt-1) * (2*seg_len) + 1;
-        % curve of skeleton, it was obtained from the shape_x and shape_y
-        ske_curv = [ worm_shape_x(end-ske_num+1:end), worm_shape_y(end-ske_num+1:end)];
+        % curve of skeleton, it was obtained from the body_x and body_y
+        ske_curv = [ worm_body_x(end-ske_num+1:end), worm_body_y(end-ske_num+1:end)];
         % compare the first 1/3 segment and last 1/3 segment part of the worm, save the
         % number of points on the skeleton that are repeated in both
         % segement. The number is used in calculating the difference. 
-        third_ske_num = round(ske_num/3);
-        tail_1third_curv = ske_curv(1:third_ske_num,:);
-        head_1third_curv = ske_curv(end-third_ske_num+1:end,:);
-        % comparing to function 'intersect', the following method is faster to count
-        % the number of duplicated points
-        tail_1third_sorted = sort(tail_1third_curv);
-        head_1third_sorted = sort(head_1third_curv);
-        dup_points = tail_1third_sorted(ismember(tail_1third_sorted,head_1third_sorted,'rows'),:);
-        
-        if size(dup_points,1)>1
-            dup_points
-        end
+%         third_ske_num = round(ske_num/3);
+%         tail_1third_curv = ske_curv(1:third_ske_num,:);
+%         head_1third_curv = ske_curv(end-third_ske_num+1:end,:);
+%         % comparing to function 'intersect', the following method is faster to count
+%         % the number of duplicated points
+%         tail_1third_sorted = sort(tail_1third_curv);
+%         head_1third_sorted = sort(head_1third_curv);
+%         dup_points = tail_1third_sorted(ismember(tail_1third_sorted,head_1third_sorted,'rows'),:);
+%         
+%         if size(dup_points,1)>1
+%             dup_points
+%         end
         
         % skeleton will not overlap with edges
  
@@ -109,15 +111,15 @@ for ii = 1:Npop_particles;
 
         if I && J
 
-            area_hypo(area_hypo_1d) = 1;
-            area_hypo_edge(area_hypo_1d(end-ske_num+1:end)) = 1;
+            area_hypo(area_hypo_1d) = logical(1);
+            area_hypo_edge(area_hypo_1d_inside(end-ske_num+1:end)) = logical(1);
             
-            area_hypo(area_hypo_1d_inside) = 1;
+            area_hypo(area_hypo_1d_inside) = logical(1);
 
 
             %area_hypo1 = imclose(area_hypo, se);
-            area_hypo1 = area_hypo;
-            log_reBW_hypo = logical(area_hypo1);
+            log_reBW_hypo = area_hypo;
+            %log_reBW_hypo = logical(area_hypo1);
 
             % cancel it to save time
             % BWdfill_hypo = imfill(log_reBW_hypo,  fliplr(worm_contour1(round(size(worm_contour1,1)/2),:))  );
@@ -130,7 +132,9 @@ for ii = 1:Npop_particles;
             diff_abs_edge = sum(sum((BW_l+ area_hypo_edge)>1.5));
 
             % Calculate the difference, the key step
-            D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*op1 + ...
+%             D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*op1 + ...
+%                 len_worm*op2 + diff_abs_edge*op3)/img_ratio; 
+            D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+...
                 len_worm*op2 + diff_abs_edge*op3)/img_ratio; 
             
             D2 = D^2;

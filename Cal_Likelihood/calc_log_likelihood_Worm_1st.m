@@ -148,10 +148,14 @@ for ii = 1:Npop_particles;
             %title('remove small areas');            
 
             % Calculate the difference, the key step
+            
             diff_abs = imabsdiff(C,BW2_hypo);
-            diff_abs_op = imopen(diff_abs,se);
-            D = (sum(sum(diff_abs+diff_abs_op*2)/2)+size(dup_points,1)*op)/img_ratio;  
-
+            %diff_abs_op = imopen(diff_abs,se);
+            diff_abs_op = imerode(diff_abs,se);
+            D = (sum(sum(diff_abs+diff_abs_op*3))+size(dup_points,1)*op)/img_ratio;  
+            %D = (sum(sum(diff_abs+diff_abs_op*3)/2)+size(dup_points,1)*op)/img_ratio;  
+            %D = (sum(sum(diff_abs))+size(dup_points,1)*op)/img_ratio;  
+            
             D2 = D^2;
             
             XX{ii,jj}.D = D;

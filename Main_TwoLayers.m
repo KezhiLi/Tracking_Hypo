@@ -21,21 +21,23 @@
 %% Parameters
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_15\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_16\.'));
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm2_21Apr15-2(3-50-100).gif';
-fname = ['results\testworm2_2(3-50-100)',date,'.avi' ];
+filename = 'results\testworm4_24Apr15-4(3-50-100).gif';
+fname = ['results\testworm4_4(3-50-100)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
-vr = VideoReader('\Sample_Video\Video_Test2.avi');
+vr = VideoReader('\Sample_Video\Video_Test4.avi');
+%vr = VideoReader('\Sample_Video\Video_Test2.avi');
 %vr = VideoReader('\Sample_Video\Video_coil.avi');
 %vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 
 % the initial state (skeleton, frenent N,T, etc)
-load Frenet_0904.mat;
+load .\Data_source\Frenet_2304(2).mat
+%load Frenet_0904.mat;
 %load Frenet_Coil;
 %load Frenet_Pt_full;
 %load Frenet_1903.mat;
@@ -57,18 +59,18 @@ sub_num_2 = 50;
 seg_len = 8;  % 8 
 
 % the estimated variance of the image (0~255)
-Xstd_rgb =  75; % 40
+Xstd_rgb =  80; % 40  % 75
 % the first derivative of the worm velocity (pixels/second)
 var_speed = 4; % 5
 var_len   = 10;
 
 % the half width of the worm (pixels= width *2)
 width = 3; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
-para_thre = 0.8;   % coil: 0.80  normal: 0.92
+para_thre = 0.76;   % coil: 0.80  normal: 0.92
 
 % length max, min    
 % Frenet_1903.mat: (88,70); Frenet_Coil.mat: (105,85);
-len_max = 85;   % 105        
+len_max = 95;   % 105        
 len_min = 70;    % 85
 size_blk = round((len_max+len_min)/12); 
 
