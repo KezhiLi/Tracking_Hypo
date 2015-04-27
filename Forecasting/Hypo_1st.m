@@ -84,12 +84,12 @@ for ii=1:Npop_particles;
     Vel = X{ii}.vel;
     Vel_norm = norm(Vel);
     
-    % parameters prepared for 'sub_num' sub-particles
-    speed = zeros(sub_num,1);
-    omg = ones(sub_num,1) * X{ii}.omg;
-    
     %% keep the same speed
     speed_ori = Vel_norm*sign(-Vel*(Frenet_k_1.T(round(end/2),1:2))');
+    
+    % parameters prepared for 'sub_num' sub-particles
+    speed = ones(sub_num,1)*speed_ori;
+    omg = ones(sub_num,1) * X{ii}.omg;
     
     % New skeleton prediction
     ske_pred_speed_ori = ske_prediction(speed_ori, pt_sp_xy, flipud(pt_sp_xy),head_loc, tail_loc, seg_len);
@@ -174,27 +174,33 @@ for ii=1:Npop_particles;
             jjj = mod((jj-75),6);
             vec_len_pred_2 = vec_len_pred;
             para_1_2 = 0.9; 
+            
+            len_stp_siz = rand(1);
             if jjj == 1  % head segment length plus
                 if rand(1)<para_1_2
-                    vec_len_pred_2(end) = vec_len_pred_2(end)+var_len*rand(1);
+                    vec_len_pred_2(end) = vec_len_pred_2(end)+var_len*len_stp_siz;
+                    speed(jj) = speed(jj) + len_stp_siz;
                 else
                     vec_len_pred_2(end-1:end) = vec_len_pred_2(end-1:end)+[var_len*rand(1);var_len*rand(1)];
                 end
             elseif jjj == 2  % head segment length minus
                 if rand(1)<para_1_2
-                    vec_len_pred_2(end) = max(vec_len_pred_2(end)-var_len*rand(1),1);
+                    vec_len_pred_2(end) = max(vec_len_pred_2(end)-var_len*len_stp_siz,1);
+                    speed(jj) = speed(jj) - len_stp_siz;
                 else
                     vec_len_pred_2(end-1:end) = max(vec_len_pred_2(end-1:end)-[var_len*rand(1);var_len*rand(1)],[1;1]);
                 end
             elseif jjj == 3   % tail segment length plus
                 if rand(1)<para_1_2
                     vec_len_pred_2(1) = vec_len_pred_2(1)+var_len*rand(1);
+                    speed(jj) = speed(jj) + len_stp_siz;
                 else
                     vec_len_pred_2(1:2) = vec_len_pred_2(1:2)+[var_len*rand(1);var_len*rand(1)];
                 end
             elseif jjj == 4   % tail segment length minus
                 if rand(1)<para_1_2
                     vec_len_pred_2(1) = max(vec_len_pred_2(1)-var_len*rand(1),1);
+                    speed(jj) = speed(jj) - len_stp_siz;
                 else
                     vec_len_pred_2(1:2) = max(vec_len_pred_2(1:2)-[var_len*rand(1);var_len*rand(1)],[1;1]);
                 end

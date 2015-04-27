@@ -18,7 +18,7 @@ open(writerObj);
 image = h5read(filename, '/mask', [1,1,2001], chunkSize);
 [~, rect] = imcrop(image);
 figure,
-for frame_number = 3002:2:4000;
+for frame_number = 3002:2:3400;
     image = h5read(filename, '/mask', [1,1,frame_number], chunkSize);
     img_rect = imcrop(image, rect);
     img_rect(img_rect<1)=195;
