@@ -29,7 +29,7 @@ N = Npop_particles*sub_num;
 L = zeros(1,N);
 
 % overlap penalty
-op = 20;
+op = 30;
 
 %% image processing to thresholding
 Y = rgb2gray(Y);

@@ -51,8 +51,12 @@ for ii=1:Npop_particles;
     Vel_norm = norm(Vel);
 
     % parameters prepared for 'sub_num' sub-particles
-    speed = zeros(sub_num,1);
+    % speed = zeros(sub_num,1);
     omg = ones(sub_num,1) * X{ii}.omg;
+    
+    %% keep the same speed
+    vel_ori = Frenet_k_1.vel;
+    speed_ori = Vel_norm*sign(-Vel*(Frenet_k_1.T(round(end/2),1:2))');
 
     % do not consider velocity 
     speed_2nd = 0;
@@ -103,7 +107,8 @@ for ii=1:Npop_particles;
 
         XX{ii,jj}.xy = ske_hypo;
         if norm(XX{ii,jj}.T(1:2))~= 0
-            XX{ii,jj}.vel = -speed(jj)*XX{ii,jj}.T(round(end/2),1:2)/norm(XX{ii,jj}.T(round(end/2),1:2));
+            XX{ii,jj}.vel = -speed_ori*XX{ii,jj}.T(round(end/2),1:2)/norm(XX{ii,jj}.T(round(end/2),1:2));
+            %XX{ii,jj}.vel = -speed(jj)*XX{ii,jj}.T(round(end/2),1:2)/norm(XX{ii,jj}.T(round(end/2),1:2));
         else 
             XX{ii,jj}.vel = X{ii}.vel;
         end
