@@ -25,18 +25,19 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm5_06May15-0(4-50-100).gif';
-fname = ['results\testworm5_0(4-50-100)',date,'.avi' ];
+filename = 'results\testworm5_15May15-0(4-50-120).gif';
+fname = ['results\testworm5_0(4-50-120)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
-vr = VideoReader('\Sample_Video\Video_Test5.avi');
+vr = VideoReader('\Sample_Video\Video_Test6.avi');
 %vr = VideoReader('\Sample_Video\Video_Test2.avi');
 %vr = VideoReader('\Sample_Video\Video_coil.avi');
 %vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 
 % the initial state (skeleton, frenent N,T, etc)
-load .\Data_source\Frenet_2704.mat
+load .\Data_source\Frenet_1405.mat
+%load .\Data_source\Frenet_2704.mat
 %load .\Data_source\Frenet_2304(2).mat
 %load Frenet_0904.mat;
 %load Frenet_Coil;
@@ -53,7 +54,7 @@ Nfrm_movie = floor(vr.Duration * vr.FrameRate);
 N_particles = 10;  % 10
 % the number of sub-particles generated in each iteration
 %sub_num = 50;  % 50
-sub_num_1 = 100;
+sub_num_1 = 120;
 sub_num_2 = 50;
 
 % the length (pixels) of each segment of the skeleton (this value relates to Frenet_Coil)
@@ -66,8 +67,8 @@ var_speed = 5; % 5
 var_len   = 10;
 
 % the half width of the worm (pixels= width *2)
-width = 4; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
-para_thre = 0.9;   % coil: 0.80  normal: 0.92
+width = 3; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
+para_thre = 0.90;   % coil: 0.80  normal: 0.92  % 0.99
 
 % length max, min    
 % Frenet_1903.mat: (88,70); Frenet_Coil.mat: (105,85);
@@ -91,13 +92,14 @@ w_Y = size(Y_1,2);
 %% Object Tracking by Particle Filter
 
 % Initial predicted worm
-X = create_particles_hypo(N_particles, Frenet_Pt{2});
+X = create_particles_hypo(N_particles*2, Frenet_Pt{2});
 
 % The worm's spine shown in figure
 worm_show = [];
 %worm_show{1} = X{1}.xy;
 worm_show = X{1}.xy;
 
+N1 = 1;
 
 % k represent the index of frame image
 for k = 3:Nfrm_movie   % 3:Nfrm_movie
@@ -109,29 +111,29 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     %% 1st layer
     %XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
     
-    XX = Hypo_1st(N_particles, sub_num_1, var_speed, var_len, X, seg_len, len_max, len_min);
+    XX1 = Hypo_1st(N_particles, sub_num_1, var_speed, var_len, X, seg_len, len_max, len_min);
     
     % Indication purpose 
     k
-    if mod(k,5)==0
-        k
+    if mod(k,10)==0
+         k
     end
     
     % Calculating Log Likelihood
-    [L, C_k, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y_k, width, seg_len, para_thre);
+    [L, C_k, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX1, Y_k, width, seg_len, para_thre);
       
     % Resampling
-    X1  = resample_particles_Worm(XX, L);
+    X1  = resample_particles_Worm(XX1, L, N1);
     
     %% 2nd layer
-    XX = Hypo_2nd(N_particles, sub_num_2, var_speed, X1, seg_len, len_max, len_min);
+    XX2 = Hypo_2nd(N1*N_particles, sub_num_2, var_speed, X1, seg_len, len_max, len_min);
     
 
     % Calculating Log Likelihood
-    [L, C_k, XX] = calc_log_likelihood_Worm_2nd_2(Xstd_rgb, XX, C_k, II, width, seg_len, size_blk, len_min);
+    [L, C_k, XX2] = calc_log_likelihood_Worm_2nd_2(Xstd_rgb, XX2, C_k, II, width, seg_len, size_blk, len_min);
       
     % Resampling
-    X  = resample_particles_Worm(XX, L);
+    X  = resample_particles_Worm(XX2, L, 1);
     
     % hold on 
 

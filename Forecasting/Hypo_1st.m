@@ -232,7 +232,7 @@ for ii=1:Npop_particles;
                 % the angle change due to the middle point change
                 ang_hypo = mid_pt_chg(angle_ske_pred,mid_start,-1, var_mid);
             end
-        elseif jj>95 && jj<99
+        elseif jj>95 && jj<max(99,sub_num-5)
             vel_i = 0;
             speed(jj) = speed_ori + vel_i * 4;
             

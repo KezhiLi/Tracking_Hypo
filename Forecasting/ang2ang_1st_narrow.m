@@ -36,12 +36,12 @@ distr(end) = distr(end)*0.6;
 ang_chan = omg * distr;
 ang_hypo_temp = ang + ang_chan;
 
-if rand(1)>0.5  % 50% probability to change angles very near head/tail with large magnitues
+if rand(1)>0.2  % 80% probability to change angles very near head/tail with large magnitues
     ang_head_chg = ang_head_i * [1,2]' * rand(1);
     ang_tail_chg = ang_tail_i * [2, 1]' * rand(1);
     ang_hypo_temp(1:2) = ang_hypo_temp(1:2) + ang_tail_chg;
     ang_hypo_temp(end-1:end) = ang_hypo_temp(end-1:end) + ang_head_chg;
-else  % 50% probability to change angles near head/tail with large magnitues
+else  % 20% probability to change angles near head/tail with large magnitues
     ang_head_chg = ang_head_i * [0.5,1,1.5,2]' * rand(1);
     ang_tail_chg = ang_tail_i * [2,1.5, 1,0.5]' * rand(1);    
     ang_hypo_temp(1:4) = ang_hypo_temp(1:4) + ang_tail_chg;

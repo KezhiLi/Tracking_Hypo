@@ -4,7 +4,7 @@ height = 201;
 
 
 iii=ii;
-plot(X{iii}.xy(:,1),height-X{iii}.xy(:,2),'b','LineWidth',2);
+%plot(X{iii}.xy(:,1),height-X{iii}.xy(:,2),'b','LineWidth',2);
 
 
 for jjj=1:15; 

@@ -1,4 +1,4 @@
-function X = resample_particles_Worm(XX, L_log)
+function X = resample_particles_Worm(XX, L_log, fold)
 % Function to resample the particles based on likelihood, and only save the
 % particles with highest samples as X for the next iteration.
 % 
@@ -14,6 +14,8 @@ function X = resample_particles_Worm(XX, L_log)
 % notices on any copies of the Software.
 
 [N_particles, sub_num] = size(XX);
+
+N_particles = N_particles * fold;
 
 % Calculating Cumulative Distribution
 L = exp(L_log - max(L_log));
@@ -45,7 +47,7 @@ sorted_I = I_unq(index(1:N_particles));
 mask_sort = zeros(1,length(Q));
 mask_sort(sorted_I) = 1;
 
-for ii = 1:size(XX,1) ;
+for ii = 1:size(XX,1)*fold ;
 X{ii} = XX{floor((sorted_I(ii)-1)/size(XX,2))+1,mod(sorted_I(ii)-1,size(XX,2))+1};
 end
 
