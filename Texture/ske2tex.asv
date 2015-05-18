@@ -1,0 +1,65 @@
+
+
+xy = [ 169.3266  158.3121
+  168.4390  150.0344
+  162.1509  145.5909
+  154.9714  142.1556
+  149.0578  136.8054
+  141.7503  132.4595
+  133.4289  131.0394
+  128.7010  124.5786
+  124.1419  117.8233
+  116.3800  116.6680];
+
+width = 3.5;
+
+load Y_1_temp.mat
+
+%texture = ske2tex(xy, width, Y_k);
+
+
+% function texture = ske2tex(xy, width, Y_k)
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+
+
+
+num_pt = size(xy,1);
+
+Y_k_gray = 255 - rgb2gray(Y_k);
+
+% neglect first 2 and last 2 points
+neglect_pt = 2; 
+
+num_step = (num_pt-2*neglect_pt)*2-1;
+pt_on_ske = zeros(num_step,2);
+
+for ii = 1:num_pt-neglect_pt*2;
+    pt_on_ske(ii*2-1,:) = xy(ii+neglect_pt,:);
+end
+for ii = 2:2:size(pt_on_ske,1);
+    pt_on_ske(ii,:) = (pt_on_ske(ii-1)+pt_on_ske(ii+1))/2;
+end
+pt_on_ske
+
+stat_pt = zeros(num_step,2);
+
+
+for jj = 1:num_step;
+    mask_cir = create_cir(pt_on_ske(jj,2), pt_on_ske(jj,1), width, size(Y_k_gray));
+    cir_full = double(Y_k_gray).* mask_cir;
+    cir = cir_full(cir_full>0);
+    stat_pt(jj,1) = mean2(cir);
+    stat_pt(jj,2) = std2(cir);
+end
+
+stat_pt
+
+
+
