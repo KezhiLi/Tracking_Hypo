@@ -119,9 +119,9 @@ for ii = 1:Npop_particles;
         head_1third_sorted = sort(head_1third_curv);
         dup_points = tail_1third_sorted(ismember(tail_1third_sorted,head_1third_sorted,'rows'),:);
         
-        if size(dup_points,1)>1
-            dup_points
-        end
+%         if size(dup_points,1)>1
+%             dup_points
+%         end
   
         I = (min(worm_shape_y) >= 1 & max(worm_shape_y) <= Npix_h);
         J = (min(worm_shape_x) >= 1 & max(worm_shape_x) <= Npix_w);

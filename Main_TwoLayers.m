@@ -25,19 +25,19 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm5_15May15-0(4-50-120).gif';
-fname = ['results\testworm5_0(4-50-120)',date,'.avi' ];
+filename = 'results\testworm5_22May15-1(3.5-50-120).gif';
+fname = ['results\testworm5_1(3.5-50-120)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
-vr = VideoReader('\Sample_Video\Video_Test6.avi');
+vr = VideoReader('\Sample_Video\Video_Test5.avi');
 %vr = VideoReader('\Sample_Video\Video_Test2.avi');
 %vr = VideoReader('\Sample_Video\Video_coil.avi');
 %vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 
 % the initial state (skeleton, frenent N,T, etc)
-load .\Data_source\Frenet_1405.mat
-%load .\Data_source\Frenet_2704.mat
+%load .\Data_source\Frenet_1405.mat
+load .\Data_source\Frenet_2704.mat
 %load .\Data_source\Frenet_2304(2).mat
 %load Frenet_0904.mat;
 %load Frenet_Coil;
@@ -67,8 +67,8 @@ var_speed = 5; % 5
 var_len   = 10;
 
 % the half width of the worm (pixels= width *2)
-width = 3; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
-para_thre = 0.90;   % coil: 0.80  normal: 0.92  % 0.99
+width = 3.5; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
+para_thre = 1.1;   % coil: 0.80  normal: 0.92  %5: 0.99 %6: 0.90
 
 % length max, min    
 % Frenet_1903.mat: (88,70); Frenet_Coil.mat: (105,85);
@@ -94,6 +94,15 @@ w_Y = size(Y_1,2);
 % Initial predicted worm
 X = create_particles_hypo(N_particles*2, Frenet_Pt{2});
 
+% texture initilization
+texture{1}=ske2tex(X{1}.xy, width, Y_2);
+%texture{2}=ske2tex(X{1}.xy, width, Y_2);
+texture_newY{1} = texture{2};
+%texture_newY{2} = texture{2};
+% 
+texture_mtx(1,1:6)=zeros(1,6);
+%texture_mtx(2,1:6)=zeros(1,6);
+
 % The worm's spine shown in figure
 worm_show = [];
 %worm_show{1} = X{1}.xy;
@@ -104,10 +113,25 @@ N1 = 1;
 % k represent the index of frame image
 for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
+    
     % Getting Image
     Y_k = read(vr, k);
     
-
+    %%
+    k_5_1 = mod(k,3);
+    k_5_fold = floor(k/3)+1;
+    
+    if k_5_1 == 0
+    texture_newY{k_5_fold} = ske2tex(X{1}.xy, width, Y_k);
+    num_pt_text = size(texture_newY{k_5_fold},1);
+    texture_mtx(k_5_fold,1:2)=sum(abs(texture_newY{k_5_fold}-texture{k_5_fold-1}))/num_pt_text;
+    texture_mtx(k_5_fold,1:2)
+    
+    num1 = 7;
+    seq_cor1 = crossCheck(texture_newY{k_5_fold}(:,1), texture{k_5_fold-1}(:,1), num1);
+    texture_mtx(k_5_fold,3) = find( min(seq_cor1)==seq_cor1);
+    end
+        
     %% 1st layer
     %XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
     
@@ -115,7 +139,7 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
     % Indication purpose 
     k
-    if mod(k,10)==0
+    if mod(k,15)==0
          k
     end
     
@@ -142,6 +166,18 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     ind = 0;
     [worm_show, X, inn_result(k)] = calculate_estimated_Worm(X, worm_show,  C_k, width,tt, seg_len, ind+1, size_blk);
     
+    %
+    if k_5_1 == 0
+    texture{k_5_fold} = ske2tex(X{1}.xy, width, Y_k);
+    num_pt_text = size(texture{k_5_fold},1);
+    texture_mtx(k_5_fold,4:5)=sum(abs(texture{k_5_fold}-texture_newY{k_5_fold}))/num_pt_text;
+    
+    num1 = 7;
+    seq_cor2 = crossCheck(texture{k_5_fold}(:,1), texture_newY{k_5_fold}(:,1), num1);
+    texture_mtx(k_5_fold,6) = find( min(seq_cor2)==seq_cor2);
+    end
+    
+    %
     show_Worm(worm_show, Y_k, width, seg_len, ind, inn_result(k),1);
     
     for ii = 5:-1:1;
@@ -150,9 +186,13 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
         show_Worm(X{ind}.xy, Y_k, width, seg_len, ind, X{ind}.D, 7-ind, inn_result);
     end
     
-    C_k_outline = bwperim(C_k);
-    [N, Vertices, Lines, Vertices_orignal] = curvature_N_areainput(C_k_outline, seg_len*2);
-    hold on, plot(Vertices(:,1),h_Y-Vertices(:,2)+1, 'LineWidth',1.2,'Color',[0 0.5 1]);
+%     C_k_outline = bwperim(C_k);
+%     [N, Vertices, Lines, Vertices_orignal] = curvature_N_areainput(C_k_outline, seg_len*2);
+%     hold on, plot(Vertices(:,1),h_Y-Vertices(:,2)+1, 'LineWidth',1.2,'Color',[0 0.5 1]);
+    
+    C_k_outline2 = bwboundaries(C_k);
+    C_k_outline2 = C_k_outline2{1};
+    hold on, plot(C_k_outline2(:,2)+1,C_k_outline2(:,1), 'LineWidth',1.2,'Color',[0 0.5 1]);
     
     drawnow
     
