@@ -25,20 +25,20 @@ addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm5_22May15-1(3.5-50-120).gif';
-fname = ['results\testworm5_1(3.5-50-120)',date,'.avi' ];
+filename = 'results\testworm3_26May15-0(3.5-50-120).gif';
+fname = ['results\testworm3_0(3.5-50-120)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
-vr = VideoReader('\Sample_Video\Video_Test5.avi');
+vr = VideoReader('\Sample_Video\Video_Test3.avi');
 %vr = VideoReader('\Sample_Video\Video_Test2.avi');
 %vr = VideoReader('\Sample_Video\Video_coil.avi');
 %vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 
 % the initial state (skeleton, frenent N,T, etc)
 %load .\Data_source\Frenet_1405.mat
-load .\Data_source\Frenet_2704.mat
-%load .\Data_source\Frenet_2304(2).mat
+%load .\Data_source\Frenet_2704.mat
+load .\Data_source\Frenet_2304.mat
 %load Frenet_0904.mat;
 %load Frenet_Coil;
 %load Frenet_Pt_full;
@@ -68,7 +68,7 @@ var_len   = 10;
 
 % the half width of the worm (pixels= width *2)
 width = 3.5; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
-para_thre = 1.1;   % coil: 0.80  normal: 0.92  %5: 0.99 %6: 0.90
+para_thre = 0.9;   % coil: 0.80  normal: 0.92  %5: 0.99 %6: 0.90
 
 % length max, min    
 % Frenet_1903.mat: (88,70); Frenet_Coil.mat: (105,85);
@@ -97,7 +97,7 @@ X = create_particles_hypo(N_particles*2, Frenet_Pt{2});
 % texture initilization
 texture{1}=ske2tex(X{1}.xy, width, Y_2);
 %texture{2}=ske2tex(X{1}.xy, width, Y_2);
-texture_newY{1} = texture{2};
+texture_newY{1} = texture{1};
 %texture_newY{2} = texture{2};
 % 
 texture_mtx(1,1:6)=zeros(1,6);
@@ -110,6 +110,9 @@ worm_show = X{1}.xy;
 
 N1 = 1;
 
+gap_frame = 3;
+X_old_1_xy = X{1}.xy;
+
 % k represent the index of frame image
 for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
@@ -118,16 +121,18 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     Y_k = read(vr, k);
     
     %%
-    k_5_1 = mod(k,3);
-    k_5_fold = floor(k/3)+1;
+    k_5_1 = mod(k,gap_frame);
+    k_5_fold = floor(k/gap_frame)+1;
+    
+    len_xy(k) = size(X{1}.xy,1);
     
     if k_5_1 == 0
-    texture_newY{k_5_fold} = ske2tex(X{1}.xy, width, Y_k);
+    texture_newY{k_5_fold} = ske2tex(X_old_1_xy, width*0.8, Y_k);
     num_pt_text = size(texture_newY{k_5_fold},1);
     texture_mtx(k_5_fold,1:2)=sum(abs(texture_newY{k_5_fold}-texture{k_5_fold-1}))/num_pt_text;
     texture_mtx(k_5_fold,1:2)
     
-    num1 = 7;
+    num1 = 9;
     seq_cor1 = crossCheck(texture_newY{k_5_fold}(:,1), texture{k_5_fold-1}(:,1), num1);
     texture_mtx(k_5_fold,3) = find( min(seq_cor1)==seq_cor1);
     end
@@ -168,13 +173,16 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
     %
     if k_5_1 == 0
-    texture{k_5_fold} = ske2tex(X{1}.xy, width, Y_k);
+    texture{k_5_fold} = ske2tex(X{1}.xy, width*0.8, Y_k);
     num_pt_text = size(texture{k_5_fold},1);
     texture_mtx(k_5_fold,4:5)=sum(abs(texture{k_5_fold}-texture_newY{k_5_fold}))/num_pt_text;
     
-    num1 = 7;
+    num1 = 9;
     seq_cor2 = crossCheck(texture{k_5_fold}(:,1), texture_newY{k_5_fold}(:,1), num1);
     texture_mtx(k_5_fold,6) = find( min(seq_cor2)==seq_cor2);
+    
+  %  figure, plot(texture{k_5_fold-1}(:,1),'b'); hold on, plot(texture_newY{k_5_fold}(:,1),'m');hold on, plot(texture{k_5_fold}(:,1),'r');
+    X_old_1_xy = X{1}.xy;
     end
     
     %
@@ -202,7 +210,7 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
     % Save the figure shown as a frame of the output video 
     mov(k-2) = save_crt_fra(filename,k, fps);
-
+    
 end
 
 % movie2avi(mov, fname, 'compression', 'None', 'fps', fps);
