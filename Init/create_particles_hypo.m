@@ -1,4 +1,4 @@
-function X = create_particles_hypo(Npop_particles,Frenet_init)
+function X = create_particles_hypo(Npop_particles,xy)
 
 % Initialization function to generate first hypothese based on Frenet_init
 %
@@ -13,7 +13,7 @@ function X = create_particles_hypo(Npop_particles,Frenet_init)
 
 
 for ii = 1: Npop_particles;
-    ske_spline = Frenet_init.xy + 0.3*randn(size(Frenet_init.xy));
+    ske_spline = xy + 0.3*randn(size(xy));
 
     X{ii}.xy = ske_spline; 
     X{ii}.T = zeros(size(ske_spline));

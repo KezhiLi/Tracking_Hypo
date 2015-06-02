@@ -21,24 +21,24 @@
 %% Parameters
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_16\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_17\.'));
 
 % the file location to save current tracking video
 % filename = 'results\testworm_1(3.5-5-50)19-Mar15.gif';
-filename = 'results\testworm3_26May15-0(3.5-50-120).gif';
-fname = ['results\testworm3_0(3.5-50-120)',date,'.avi' ];
+filename = 'results\testworm5_02Jun15-0(3.5-50-120).gif';
+fname = ['results\testworm5_0(3.5-50-120)',date,'.avi' ];
 
 %% Loading Movie
 % the input video
-vr = VideoReader('\Sample_Video\Video_Test3.avi');
+vr = VideoReader('\Sample_Video\Video_Test5.avi');
 %vr = VideoReader('\Sample_Video\Video_Test2.avi');
 %vr = VideoReader('\Sample_Video\Video_coil.avi');
 %vr = VideoReader('\Sample_Video\Video_09-Mar-2015.avi');
 
 % the initial state (skeleton, frenent N,T, etc)
 %load .\Data_source\Frenet_1405.mat
-%load .\Data_source\Frenet_2704.mat
-load .\Data_source\Frenet_2304.mat
+load .\Data_source\Frenet_2704.mat
+%load .\Data_source\Frenet_2304.mat
 %load Frenet_0904.mat;
 %load Frenet_Coil;
 %load Frenet_Pt_full;
@@ -63,17 +63,17 @@ seg_len = 8;  % 8
 % the estimated variance of the image (0~255)
 Xstd_rgb =  60; % 40  % 75
 % the first derivative of the worm velocity (pixels/second)
-var_speed = 5; % 5
+var_speed = 2; % 5
 var_len   = 10;
 
 % the half width of the worm (pixels= width *2)
 width = 3.5; % 3.5      Frenet_1903.mat: 3;  Frenet_Coil: 3.5;
-para_thre = 0.9;   % coil: 0.80  normal: 0.92  %5: 0.99 %6: 0.90
+para_thre = 1;   % coil: 0.80  normal: 0.92 % 2:0.88  %5: 1 %6: 0.90
 
 % length max, min    
 % Frenet_1903.mat: (88,70); Frenet_Coil.mat: (105,85);
 len_max = 95;   % 105        
-len_min = 70;    % 85
+len_min = 65;    % 85
 size_blk = round((len_max+len_min)/12); 
 
 % video rate
@@ -91,16 +91,18 @@ w_Y = size(Y_1,2);
 
 %% Object Tracking by Particle Filter
 
-% Initial predicted worm
-X = create_particles_hypo(N_particles*2, Frenet_Pt{2});
+% Initial predicted worm !!!!
+X = create_particles_hypo(N_particles*2, Frenet_Pt{2}.xy_flp);
+%X = create_particles_hypo(N_particles*2, Frenet_Pt{2}.xy);
 
 % texture initilization
 texture{1}=ske2tex(X{1}.xy, width, Y_2);
 %texture{2}=ske2tex(X{1}.xy, width, Y_2);
 texture_newY{1} = texture{1};
 %texture_newY{2} = texture{2};
-% 
-texture_mtx(1,1:6)=zeros(1,6);
+
+% initialize texture matrix
+texture_mtx(1,1:9)=zeros(1,9);
 %texture_mtx(2,1:6)=zeros(1,6);
 
 % The worm's spine shown in figure
@@ -133,14 +135,15 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     texture_mtx(k_5_fold,1:2)
     
     num1 = 9;
+    mid_num = (num1+1)/2;
     seq_cor1 = crossCheck(texture_newY{k_5_fold}(:,1), texture{k_5_fold-1}(:,1), num1);
-    texture_mtx(k_5_fold,3) = find( min(seq_cor1)==seq_cor1);
+    texture_mtx(k_5_fold,3) = find( min(seq_cor1)==seq_cor1)-mid_num;
     end
         
     %% 1st layer
     %XX = Forecasting(N_particles, sub_num, var_speed, X, seg_len, len_max, len_min);
     
-    XX1 = Hypo_1st(N_particles, sub_num_1, var_speed, var_len, X, seg_len, len_max, len_min);
+    XX1 = Hypo_1st(N_particles, sub_num_1, var_speed, var_len, X, seg_len, len_max, len_min, texture_mtx(k_5_fold,3));
     
     % Indication purpose 
     k
@@ -149,7 +152,7 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     end
     
     % Calculating Log Likelihood
-    [L, C_k, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX1, Y_k, width, seg_len, para_thre);
+    [L, C_k, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX1, Y_k, width, seg_len, para_thre, len_min);
       
     % Resampling
     X1  = resample_particles_Worm(XX1, L, N1);
@@ -159,7 +162,7 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     
 
     % Calculating Log Likelihood
-    [L, C_k, XX2] = calc_log_likelihood_Worm_2nd_2(Xstd_rgb, XX2, C_k, II, width, seg_len, size_blk, len_min);
+    [L, C_k, XX2] = calc_log_likelihood_Worm_2nd_2(Xstd_rgb, XX2, C_k, II, width, seg_len, size_blk);
       
     % Resampling
     X  = resample_particles_Worm(XX2, L, 1);
@@ -177,11 +180,16 @@ for k = 3:Nfrm_movie   % 3:Nfrm_movie
     num_pt_text = size(texture{k_5_fold},1);
     texture_mtx(k_5_fold,4:5)=sum(abs(texture{k_5_fold}-texture_newY{k_5_fold}))/num_pt_text;
     
-    num1 = 9;
+
     seq_cor2 = crossCheck(texture{k_5_fold}(:,1), texture_newY{k_5_fold}(:,1), num1);
-    texture_mtx(k_5_fold,6) = find( min(seq_cor2)==seq_cor2);
+    texture_mtx(k_5_fold,6) = find( min(seq_cor2)==seq_cor2)-mid_num;
     
-  %  figure, plot(texture{k_5_fold-1}(:,1),'b'); hold on, plot(texture_newY{k_5_fold}(:,1),'m');hold on, plot(texture{k_5_fold}(:,1),'r');
+    texture_mtx(k_5_fold,7:8)=sum(abs(texture{k_5_fold}-texture{k_5_fold-1}))/num_pt_text;
+    seq_cor3 = crossCheck(texture{k_5_fold}(:,1), texture{k_5_fold-1}(:,1), num1);
+    texture_mtx(k_5_fold,9) = find( min(seq_cor3)==seq_cor3)-mid_num;   
+    
+    %figure, plot(texture{k_5_fold-1}(:,1),'b'); hold on, plot(texture_newY{k_5_fold}(:,1),'m');hold on, plot(texture{k_5_fold}(:,1),'r');
+    
     X_old_1_xy = X{1}.xy;
     end
     

@@ -1,4 +1,4 @@
-function [L,C, XX] = calc_log_likelihood_Worm_2nd(Xstd_rgb, XX, C, II, width, seg_len, size_blk, len_min)
+function [L,C, XX] = calc_log_likelihood_Worm_2nd_2(Xstd_rgb, XX, C, II, width, seg_len, size_blk)%, len_min)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
@@ -35,7 +35,7 @@ BW_l = edge(II,'log');
        
 % overlap penalty
 op1 = 30;
-op2 = 1;  % at first: 2 
+op2 = 2;  % at first: 2 
 op3 = 6;  % at first: 2
 
 %% likelihood equation
@@ -81,7 +81,7 @@ for ii = 1:Npop_particles;
         mask_head = square_mtx_fast(mask_ori, XX{ii,jj}.xy(end-1,:), size_blk);
         mask = square_mtx_fast(mask_head, XX{ii,jj}.xy(2,:), size_blk);  
         
-        len_worm = pt_len(worm_body(end-m_fre_pt+1:end,:))-len_min;
+        %len_worm = pt_len(worm_body(end-m_fre_pt+1:end,:))-len_min;
         
         % number of points on the skeleton
         ske_num = (m_fre_pt-1) * (2*seg_len) + 1;
@@ -134,9 +134,11 @@ for ii = 1:Npop_particles;
             % Calculate the difference, the key step
 %             D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+size(dup_points,1)*op1 + ...
 %                 len_worm*op2 + diff_abs_edge*op3)/img_ratio; 
+            % D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+...
+            %     len_worm*op2 + diff_abs_edge*op3)/img_ratio; 
             D = (sum(sum((imabsdiff(C,BW2_hypo)).*mask))+...
-                len_worm*op2 + diff_abs_edge*op3)/img_ratio; 
-            
+                + diff_abs_edge*op3)/img_ratio; 
+                
             D2 = D^2;
             
             XX{ii,jj}.D = D;

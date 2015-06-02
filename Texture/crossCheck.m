@@ -1,4 +1,4 @@
-function seq_cor = crossCheck(seq1, seq2, num)
+function seq_cor = crossCheck(seq1_ori, seq2_ori, num)
 % 
 % 
 % 
@@ -13,6 +13,9 @@ function seq_cor = crossCheck(seq1, seq2, num)
 
 shift = round((num-1)/2);
 shift_vec = [-shift:shift];
+
+seq1 = seq1_ori - mean(seq1_ori);
+seq2 = seq2_ori - mean(seq2_ori);
 
 len_seq = length(seq1);
 

@@ -1,4 +1,4 @@
-function XX = Hypo_1st(Npop_particles, sub_num, var_speed, var_len, X, seg_len, len_max, len_min)
+function XX = Hypo_1st(Npop_particles, sub_num, var_speed, var_len, X, seg_len, len_max, len_min, estimate_shift)
 % function to calculate the rough hypothese as the 1st layer of the 2-lay
 % hypothesis tracking algoirthm.
 %
@@ -87,6 +87,14 @@ for ii=1:Npop_particles;
     %% keep the same speed
     speed_ori = Vel_norm*sign(-Vel*(Frenet_k_1.T(round(end/2),1:2))');
     
+    % modify the speed_ori accordingly based on estimate_shift
+    shift = -estimate_shift;
+    if shift>0.5 && speed_ori<shift*1
+        speed_ori = shift*1;
+    elseif shift<-0.5 && speed_ori>shift*1
+        speed_ori = shift*1;
+    end
+    
     % parameters prepared for 'sub_num' sub-particles
     speed = ones(sub_num,1)*speed_ori;
     omg = ones(sub_num,1) * X{ii}.omg;
@@ -173,7 +181,7 @@ for ii=1:Npop_particles;
             
             jjj = mod((jj-75),6);
             vec_len_pred_2 = vec_len_pred;
-            para_1_2 = 0.9; 
+            para_1_2 = 0.9;  % 90% probability excute the first command, 10% probability else 
             
             len_stp_siz = rand(1);
             if jjj == 1  % head segment length plus

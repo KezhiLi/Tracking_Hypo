@@ -1,4 +1,4 @@
-function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_len,  para_thre)
+function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_len,  para_thre, len_min)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
@@ -30,6 +30,7 @@ L = zeros(1,N);
 
 % overlap penalty
 op = 30;
+op2 = 4;  % at first: 2 
 
 %% image processing to thresholding
 Y = rgb2gray(Y);
@@ -87,6 +88,7 @@ area_hypo_ori = logical(zeros(Npix_h,0)*zeros(0,Npix_w));
 
 max_diff=1;
 
+
 for ii = 1:Npop_particles;
     for jj = 1:sub_num;
 
@@ -122,6 +124,8 @@ for ii = 1:Npop_particles;
 %         if size(dup_points,1)>1
 %             dup_points
 %         end
+
+        len_worm = pt_len(worm_body(end-m_fre_pt+1:end,:))-len_min;
   
         I = (min(worm_shape_y) >= 1 & max(worm_shape_y) <= Npix_h);
         J = (min(worm_shape_x) >= 1 & max(worm_shape_x) <= Npix_w);
@@ -152,7 +156,8 @@ for ii = 1:Npop_particles;
             diff_abs = imabsdiff(C,BW2_hypo);
             %diff_abs_op = imopen(diff_abs,se);
             diff_abs_op = imerode(diff_abs,se);
-            D = (sum(sum(diff_abs+diff_abs_op*3))+size(dup_points,1)*op)/img_ratio;  
+            D = (sum(sum(diff_abs+diff_abs_op*3))+size(dup_points,1)*op+ len_worm*op2)/img_ratio;  
+            %D = (sum(sum(diff_abs+diff_abs_op*3))+size(dup_points,1)*op)/img_ratio;  
             %D = (sum(sum(diff_abs+diff_abs_op*3)/2)+size(dup_points,1)*op)/img_ratio;  
             %D = (sum(sum(diff_abs))+size(dup_points,1)*op)/img_ratio;  
             
