@@ -1,9 +1,9 @@
-function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_len,  para_thre, len_min)
+function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y_gray, width, seg_len,  para_thre, len_min)
 
 % function to calculate the log likelihood of hypotheses
 % Input:    Xstd_rgb: a scalar, the various of the image set in advance
 %                 XX: an Npop_particles * sub_num cell, record all hypotheses data
-%                  Y: a matrix, current frame captured
+%             Y_gray: a matrix, current frame captured
 %              width: a scalar, the worm's width
 % Output:  L:  a vector record the log likelihood
 %          C:  a matrix, the image after thresholding
@@ -15,8 +15,8 @@ function [L,C, II] = calc_log_likelihood_Worm_1st(Xstd_rgb, XX, Y, width, seg_le
 % notices on any copies of the Software.
 
 % size of image
-Npix_h = size(Y, 1);
-Npix_w = size(Y, 2);
+Npix_h = size(Y_gray, 1);
+Npix_w = size(Y_gray, 2);
 
 % number of paricles and sub-particles
 Npop_particles = size(XX,1);
@@ -33,12 +33,12 @@ op = 30;
 op2 = 4;  % at first: 2 
 
 %% image processing to thresholding
-Y = rgb2gray(Y);
-II = 255 - Y;
+% Y = rgb2gray(Y);
+% II = 255 - Y;
 
 % imclose
 se = strel('disk', 1);
-II = imclose(II, se);
+II = imclose(Y_gray, se);
 
 %figure, hist(double(I),256); 
 

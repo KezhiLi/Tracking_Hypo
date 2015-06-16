@@ -82,7 +82,7 @@ ang_hypo(mid_start) = ang_hypo_temp(mid_start);
 
 % set the max magnitude of angle variance bound, be careful about the case when angles
 % larger tha pi or smaller than -pi
-thre = 1.3;
+thre = 0.8;  % 1.3 
 for ii = mid_start:-1:2;
     if abs(ang_hypo_temp(ii-1)-ang_hypo(ii))<thre||abs(abs(ang_hypo_temp(ii-1)-ang_hypo(ii))-2*pi)<thre;
         ang_hypo(ii-1) = ang_hypo_temp(ii-1);

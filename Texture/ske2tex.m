@@ -1,4 +1,4 @@
-function texture = ske2tex(xy, width, Y_k)
+function texture = ske2tex(xy, width, Y_k_gray)
 % 
 % 
 % 
@@ -12,7 +12,7 @@ function texture = ske2tex(xy, width, Y_k)
 
 num_pt = size(xy,1);
 
-Y_k_gray = 255 - rgb2gray(Y_k);
+% Y_k_gray = 255 - rgb2gray(Y_k);
 
 % neglect first 2 and last 2 points
 neglect_pt = 2; 

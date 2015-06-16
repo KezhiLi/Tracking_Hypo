@@ -1,45 +1,44 @@
-% Function to initialize the 1st several frames of video. 
-% Show the results in Figures 1~4.
-% Fig. 1: worm's contour after segmentation
-% Fig. 2: worm's contour after smoothing and their curvatures
-% Fig. 3: worm's curvature magnitures of all points on contour
-% Fig. 4: the recognized worm's contour(red), skeleton(red), skeleton 
-% after downsampling(blue) head and tail (blue), central point(green), 
-% tangent vector(yellow) and perpendicular vector(green). 
-% 
-% Save: Frenet_coil.mat (the points on skeleton with seg_len interver, 
-%       get prepared for video tracking function Main. 
-%       The seg_len in Main.m should be consistent to samp_step in this file.)
-% 
-% Copyrighit: author: Kezhi Li, CSC, MRC, Imperial College, London
-% 27/02/2015
-% You will not remove any copyright or other notices from the Software; 
-% you must reproduce all copyright notices and other proprietary 
-% notices on any copies of the Software.
+clear
+clc
 
-clc;
-clear;
+%%
+movies_file = '/Volumes/behavgenom$/GeckoVideo/Invidual_videos/20150512/Capture_Ch1_12052015_194303/';
+%kezhi_file = '/Volumes/behavgenom$/GeckoVideo/kezhi_format/20150512/Capture_Ch1_12052015_194303/';
+%kezhi_file = '/Users/ajaver/Desktop/Gecko_compressed/20150511/kezhi_format/Capture_Ch1_11052015_195105_kezhi.hdf5';
+%kezhi_file = 'N:\GeckoVideo\kezhi_format\20150512\Capture_Ch1_12052015_194303';
+%kezhi_file = 'C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_20\Sample_Video\hdf5\worm_1251.hdf5';
+kezhi_file = 'C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_20\Sample_Video\hdf5\worm_7818.hdf5';
+
+masks = h5read(kezhi_file, '/masks');
+frames = h5read(kezhi_file,'/frames');
+CMs = h5read(kezhi_file, '/CMs');
+
+%plot movement of the center of mass
+figure
+plot(CMs(1,:), CMs(2,:))
+
+%select a frame
+frame = 25;
+%imshow(masks(:,:,10),[])
+
+%%
+
 
 % % Create Frenet Frame
 % addpath(genpath('C:\Kezhi\MyCode!!!\.'));
 % addpath(genpath('C:\Kezhi\Software\SegWorm-master\SegWorm-master\.'));
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_17\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_20\.'));
 
 % The sample step of points on skeleton. Change it accordingly in the Main
 % function of video processing.
 samp_step = 8;
 
-% Input video
-%vr = VideoReader('Vedeo_coil.avi');
-fname = ['Sample_Video\Video_',date,'.avi' ];
-%fname = ['Sample_Video\Video_14-May-2015.avi'];
-vr = VideoReader(fname);
 % Read frames from the video
-Y_1 = read(vr, 1);
-Y_2 = read(vr, 2);
-Y_3 = read(vr, 3);
+Y_1 = masks(:,:,1);
+Y_2 = masks(:,:,2);
+Y_3 = masks(:,:,3);
 
 % threshold
 thre = 0.9;  % 0.96
@@ -51,24 +50,25 @@ Frenet_Pt{1}.xy_flp = {};
 Frenet_Pt{1}.T = {};
 Frenet_Pt{1}.N = {};
 
-I = rgb2gray(Y_2);
+I = Y_1;
+% I = rgb2gray(Y_1);
 %I = rgb;
 [mm,nn]= size(I);
 %figure, imshow(I), title('Original')
-II = 255 - I;   
-
-se = strel('disk', 1);
-II = imclose(II, se);
-%figure
-%imshow(II), title('Opening-closing (Ioc II)')
-
- III = imclose(II, se);
-% figure
-% imshow(III), title('Opening-closing (Ioc III)')
+% II = 255 - I;   
+% 
+% se = strel('disk', 1);
+% II = imclose(II, se);
+% %figure
+% %imshow(II), title('Opening-closing (Ioc II)')
+% 
+%  III = imclose(II, se);
+% % figure
+% % imshow(III), title('Opening-closing (Ioc III)')
 
 %figure, hist(double(I),256);
-level = graythresh(II)*thre;  % 0.96
-BW = im2bw(II,level);
+level = graythresh(I)*thre;  % 0.96
+BW = im2bw(I,level);
 % figure, imshow(BW)
 
 reBW = BW;
@@ -243,16 +243,22 @@ quiver(Frenet_Pt{k}.xy(hf_ske_index,1),Frenet_Pt{k}.xy(hf_ske_index,2),Frenet_Pt
 %% Save the Frenet for future use
 Frenet_Pt{2}=Frenet_Pt{1};
 
+% Save data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 frenet_name = ['.\Data_source\Frenet_',date,'.mat' ];
 
-save .\Data_source\Frenet_0306.mat Frenet_Pt
+save frenet_name Frenet_Pt CMs
+
+%save .\Data_source\Frenet_0306.mat Frenet_Pt
 %save .\Data_source\Frenet_2304(2).mat Frenet_Pt
 %save Frenet_0904.mat Frenet_Pt
 
 
+%fname = ['test_',date,'.avi' ]; %%%% Please change them accordingly!!!!
+% Create AVI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+fname = ['test_7818.avi'];
+workingDir = 'C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_20\Sample_Video\hdf5';
 
-
-
+Create_Mov(masks, fname, frame, workingDir);
 
 
 

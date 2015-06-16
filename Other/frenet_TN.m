@@ -83,10 +83,10 @@ dTx1 = DGradient(TT(:,1),size_T1,1, '1stOrder');
 dTy1 = DGradient(TT(:,2),size_T1,1, '1stOrder');
 dTz1 = DGradient(TT(:,3),size_T1,1, '1stOrder');
 dT1 = [dTx1 dTy1 dTz1];
-
+dT11 =  [dTx1 dTy1];
 
 % NORMAL
-NN = dT1./mag(dT1,3);
+NN = dT11./mag(dT1,nargin);
 
 
 % N = dT./mag(dT,3);
@@ -102,7 +102,7 @@ NN = dT1./mag(dT1,3);
 
 
 
-function N = mag(T,n),
+function N = mag(T,n)
 % MAGNATUDE OF A VECTOR (Nx3)
 %  M = mag(U)
 N = sum(abs(T).^2,2).^(1/2);

@@ -29,8 +29,8 @@ end
 mid_start = round(len_ang/2);
 mid_end = mid_start+1;
 
-ang_head_chg = ang_head_i * [0.15,0.25,0.4,0.55]';
-ang_tail_chg = ang_tail_i * [0.75,0.55,0.4,0.2]';
+ang_head_chg = ang_head_i * [0.10,0.20,0.35,0.5]';
+ang_tail_chg = ang_tail_i * [0.65,0.45,0.3,0.15]';
 
 % These two are designed functions for variances of tha angle change
 distr =  (exp(-0.5*(len_ang-(1:len_ang))))';   % -0.9
@@ -52,7 +52,7 @@ ang_hypo(mid_start) = ang_hypo_temp(mid_start);
 
 % set the max magnitude of angle variance bound, be careful about the case when angles
 % larger tha pi or smaller than -pi
-thre = 1.4;
+thre = 0.8;    % thre = 1.4 for normal test images
 for ii = mid_start:-1:2;
     if abs(ang_hypo_temp(ii-1)-ang_hypo(ii))<thre||abs(abs(ang_hypo_temp(ii-1)-ang_hypo(ii))-2*pi)<thre;
         ang_hypo(ii-1) = ang_hypo_temp(ii-1);
