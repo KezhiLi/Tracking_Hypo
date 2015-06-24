@@ -111,7 +111,7 @@ for ii = 1:Npop_particles;
         ske_curv = [ worm_shape_x(end-ske_num+1:end), worm_shape_y(end-ske_num+1:end)];
         % compare the first 1/3 segment and last 1/3 segment part of the worm, save the
         % number of points on the skeleton that are repeated in both
-        % segement. The number is used in calculating the difference. 
+        % segement. The number is used in calculating the difference regarding overlapping. 
         third_ske_num = round(ske_num/3);
         tail_1third_curv = ske_curv(1:third_ske_num,:);
         head_1third_curv = ske_curv(end-third_ske_num+1:end,:);

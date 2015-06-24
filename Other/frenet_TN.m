@@ -53,7 +53,7 @@ x = x(:);
 y = y(:);
 z = z(:);
 
-% SPEED OF CURVE
+% %SPEED OF CURVE
 % dx = gradient(x);
 % dy = gradient(y);
 % dz = gradient(z);
@@ -63,14 +63,17 @@ dx1 = DGradient(x,length(x),1, '1stOrder');
 dy1 = DGradient(y,length(y),1, '1stOrder');
 dz1 = DGradient(z,length(z),1, '1stOrder');
 dr1 = [dx1 dy1 dz1];
-
+dr11 = [dx1 dy1];
 
 % TANGENT
 % TT = dr;
 % T = dr./mag(dr,3);
 
-TT = dr1;
-%T1 = dr1./mag(dr1,3);
+% NORMAL
+TT = dr1./mag(dr1,3);
+
+
+
 
 % DERIVIATIVE OF TANGENT
 % dTx =  gradient(T(:,1));
@@ -86,8 +89,11 @@ dT1 = [dTx1 dTy1 dTz1];
 dT11 =  [dTx1 dTy1];
 
 % NORMAL
-NN = dT11./mag(dT1,nargin);
-
+if nargin == 2
+    NN = dT11./mag(dT1,2);
+elseif nargin == 3
+    NN = dT1./mag(dT1,3);
+end
 
 % N = dT./mag(dT,3);
 % % BINORMAL
@@ -98,8 +104,6 @@ NN = dT11./mag(dT1,nargin);
 % k = mag(cross(dr,ddr),1)./((mag(dr,1)).^3);
 % % TORSION
 % t = dot(-B,N,2);
-
-
 
 
 function N = mag(T,n)

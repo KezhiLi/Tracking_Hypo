@@ -25,7 +25,7 @@ clear;
 % addpath(genpath('C:\Kezhi\Software\SegWorm-master\SegWorm-master\.'));
 
 % please add the folder name here
-addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_17\.'));
+addpath(genpath('C:\Kezhi\MyCode!!!\Tracking\PF_Video_EN_Worm_Kezhi\PF_Video_EN\Tracking_Hypo_20\.'));
 
 % The sample step of points on skeleton. Change it accordingly in the Main
 % function of video processing.

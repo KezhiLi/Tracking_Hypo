@@ -9,7 +9,8 @@ function mov = save_crt_fra(filename, k, fps)
 % you must reproduce all copyright notices and other proprietary 
 % notices on any copies of the Software.
 
- frame = getframe(1);
+ %frame = getframe(1);
+ frame = getframe(axes2);
  im = frame2im(frame);
  [imind,cm] = rgb2ind(im,256);
  if k == 3;

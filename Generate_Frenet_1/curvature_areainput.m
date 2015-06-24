@@ -1,4 +1,4 @@
-function [k, N, Vertices, Lines, Vertices_old] = curvature_areainput(Area)
+function [k, N, Vertices, Lines, Vertices_old] = curvature_areainput_GUI(Area)
 %%
 % Input: BWoutline is a logical matrix decribles the outline of a shape
 % Output: k is M x 1 Curvature values
